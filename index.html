@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Salud UCN - Portal 3D Vibrante</title>
+    
+    <!-- React & Babel -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap');
+        
+        :root {
+            --slate-800: #1e293b; --slate-700: #334155; --slate-600: #475569; --slate-500: #64748b; --slate-400: #94a3b8;
+            --blue-500: #3b82f6; --blue-600: #2563eb; --emerald-600: #059669; --purple-600: #9333ea; --red-600: #dc2626;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid #e5e7eb; }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            background: radial-gradient(circle at top right, #fdf4ff, #e0e7ff, #f3e8ff);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        button, input { font-family: inherit; outline: none; background: transparent; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Barra de Scroll Creativa Original */
+        ::-webkit-scrollbar { width: 14px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.4); border-radius: 100px; margin: 4px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(to bottom, #3b82f6, #a855f7, #ec4899); border-radius: 100px; border: 3px solid #fdf4ff; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(to bottom, #2563eb, #9333ea, #db2777); }
+        html { scrollbar-width: thin; scrollbar-color: #a855f7 transparent; }
+
+        /* Animaciones Originales */
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.9) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        .animate-pop { animation: popIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+        .animate-fade { animation: fade 0.4s ease-out forwards; }
+        @keyframes ping-custom { 0% { transform: scale(1); opacity: 1; } 75%, 100% { transform: scale(2); opacity: 0; } }
+        .animate-ping { animation: ping-custom 1.5s cubic-bezier(0, 0, 0.2, 1) infinite; }
+        @keyframes pulse-custom { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .animate-pulse { animation: pulse-custom 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+        /* Componentes Base y Layout */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+        .icon-reflection {
+            clip-path: polygon(0 0, 100% 0, 100% 35%, 0 50%);
+            background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        .text-slate-800 { color: var(--slate-800); }
+        .text-slate-700 { color: var(--slate-700); }
+        .text-slate-600 { color: var(--slate-600); }
+        .text-slate-500 { color: var(--slate-500); }
+        .text-slate-400 { color: var(--slate-400); }
+        .text-slate-300 { color: #cbd5e1; }
+        .text-white { color: #ffffff; }
+
+        .min-h-screen { min-height: 100vh; }
+        .pb-28 { padding-bottom: 7rem; }
+        .pb-10 { padding-bottom: 2.5rem; }
+        .max-w-5xl { max-width: 64rem; }
+        .max-w-2xl { max-width: 42rem; }
+        .max-w-md { max-width: 28rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .mx-4 { margin-left: 1rem; margin-right: 1rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mt-8 { margin-top: 2rem; }
+        .mt-10 { margin-top: 2.5rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mb-10 { margin-bottom: 2.5rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
+        .p-2 { padding: 0.5rem; }
+        .p-4 { padding: 1rem; }
+        .p-5 { padding: 1.25rem; }
+        .p-6 { padding: 1.5rem; }
+        .p-8 { padding: 2rem; }
+        .p-10 { padding: 2.5rem; }
+        
+        .transition-all { transition-property: all; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
+        .transition-transform { transition-property: transform; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
+        .duration-500 { transition-duration: 500ms; }
+        .duration-300 { transition-duration: 300ms; }
+        .bg-transparent { background-color: transparent; }
+
+        .flex { display: flex; }
+        .grid { display: grid; }
+        .flex-col { flex-direction: column; }
+        .justify-between { justify-content: space-between; }
+        .justify-around { justify-content: space-around; }
+        .justify-center { justify-content: center; }
+        .items-center { align-items: center; }
+        .items-end { align-items: flex-end; }
+        .items-start { align-items: flex-start; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-5 { gap: 1.25rem; }
+        .gap-6 { gap: 1.5rem; }
+        .gap-8 { gap: 2rem; }
+        
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .fixed { position: fixed; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .z-10 { z-index: 10; }
+        .z-40 { z-index: 40; }
+        .z-50 { z-index: 50; }
+        .top-0 { top: 0; }
+        .right-0 { right: 0; }
+        .bottom-6 { bottom: 1.5rem; }
+        .left-1\/2 { left: 50%; }
+        .-translate-x-1\/2 { transform: translateX(-50%); }
+        .shrink-0 { flex-shrink: 0; }
+        .flex-1 { flex: 1 1 0%; }
+        .w-full { width: 100%; }
+        .w-\[95\%\] { width: 95%; }
+        .h-full { height: 100%; }
+        .overflow-hidden { overflow: hidden; }
+        
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-3xl { border-radius: 1.5rem; }
+        .rounded-\[1\.2rem\] { border-radius: 1.2rem; }
+        .rounded-\[1\.5rem\] { border-radius: 1.5rem; }
+        .rounded-\[2rem\] { border-radius: 2rem; }
+        .rounded-\[2\.5rem\] { border-radius: 2.5rem; }
+        .rounded-\[3rem\] { border-radius: 3rem; }
+        .rounded-full { border-radius: 9999px; }
+        .border { border-width: 1px; }
+        .border-2 { border-width: 2px; }
+        
+        .font-bold { font-weight: 700; }
+        .font-black { font-weight: 900; }
+        .font-semibold { font-weight: 600; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-base { font-size: 1rem; line-height: 1.5rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
+        .text-\[10px\] { font-size: 10px; }
+        .uppercase { text-transform: uppercase; }
+        .tracking-tight { letter-spacing: -0.025em; }
+        .tracking-tighter { letter-spacing: -0.05em; }
+        .tracking-widest { letter-spacing: 0.1em; }
+        .leading-tight { line-height: 1.25; }
+        .leading-relaxed { line-height: 1.625; }
+        
+        .cursor-pointer { cursor: pointer; }
+        .drop-shadow-sm { filter: drop-shadow(0 1px 1px rgba(0,0,0,0.05)); }
+        .drop-shadow-md { filter: drop-shadow(0 4px 3px rgba(0,0,0,0.07)); }
+        .drop-shadow-lg { filter: drop-shadow(0 10px 8px rgba(0,0,0,0.04)); }
+
+        .line-clamp-1 { display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* Grid Responsive */
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        @media (min-width: 640px) {
+            .sm\:px-8 { padding-left: 2rem; padding-right: 2rem; }
+            .sm\:p-16 { padding: 4rem; }
+            .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .sm\:block { display: block; }
+            .sm\:hidden { display: none; }
+            .sm\:items-center { align-items: center; }
+            .sm\:p-4 { padding: 1rem; }
+            .sm\:rounded-\[2\.5rem\] { border-radius: 2.5rem; }
+        }
+        @media (min-width: 768px) {
+            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .md\:flex-row { flex-direction: row; }
+        }
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .lg\:grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .lg\:col-span-1 { grid-column: span 1 / span 1; }
+            .lg\:col-span-2 { grid-column: span 2 / span 2; }
+            .lg\:flex-col { flex-direction: column; }
+        }
+
+        /* Sombras Originales de Tailwind Config */
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+        .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); }
+        
+        .shadow-3d { box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1), inset 0 2px 2px rgba(255, 255, 255, 0.6), inset 0 -2px 5px rgba(0, 0, 0, 0.05); }
+        .shadow-3d-pressed { box-shadow: 0 2px 4px rgba(0,0,0,0.1), inset 0 4px 8px rgba(0,0,0,0.1); }
+        .shadow-glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        .shadow-glow-purple { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+        .shadow-glow-rose { box-shadow: 0 0 20px rgba(244, 63, 94, 0.5); }
+        .shadow-glow-amber { box-shadow: 0 0 20px rgba(245, 158, 11, 0.5); }
+        .shadow-glow-emerald { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+        .shadow-glow-red { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
+
+        /* Clases Dinámicas y Pseudoclases */
+        .group:hover .group-hover\:-translate-y-2 { transform: translateY(-0.5rem); }
+        .group:hover .group-hover\:scale-110 { transform: scale(1.1); }
+        .group:hover .group-hover\:scale-150 { transform: scale(1.5); }
+        .group:hover .group-hover\:rotate-12 { transform: rotate(12deg); }
+        .group:hover .group-hover\:-rotate-12 { transform: rotate(-12deg); }
+        .group:hover .group-hover\:text-blue-500 { color: var(--blue-500); }
+        .group:hover .group-hover\:text-emerald-600 { color: var(--emerald-600); }
+        .group:hover .group-hover\:scale-105 { transform: scale(1.05); }
+        
+        .hover\:-translate-y-1:hover { transform: translateY(-0.25rem); }
+        .hover\:-translate-y-2:hover { transform: translateY(-0.5rem); }
+        .hover\:shadow-3d:hover { box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1), inset 0 2px 2px rgba(255, 255, 255, 0.6), inset 0 -2px 5px rgba(0, 0, 0, 0.05); }
+        .hover\:shadow-3d-pressed:hover { box-shadow: 0 2px 4px rgba(0,0,0,0.1), inset 0 4px 8px rgba(0,0,0,0.1); }
+        .hover\:shadow-glow-blue:hover { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+        .hover\:shadow-glow-purple:hover { box-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
+        .hover\:shadow-glow-red:hover { box-shadow: 0 0 25px rgba(239, 68, 68, 0.6); }
+        .hover\:shadow-glow-emerald:hover { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+        .hover\:shadow-glow-amber:hover { box-shadow: 0 0 20px rgba(245, 158, 11, 0.5); }
+        .hover\:shadow-glow-rose:hover { box-shadow: 0 0 20px rgba(244, 63, 94, 0.5); }
+        
+        .hover\:bg-slate-50:hover { background-color: #f8fafc; }
+        .hover\:bg-slate-100:hover { background-color: #f1f5f9; }
+        .hover\:bg-slate-800:hover { background-color: var(--slate-800); }
+        .hover\:bg-white:hover { background-color: #ffffff; }
+        .hover\:bg-purple-50:hover { background-color: #faf5ff; }
+        .hover\:bg-red-50:hover { background-color: #fef2f2; }
+        .hover\:bg-emerald-50:hover { background-color: #ecfdf5; }
+        
+        .hover\:text-purple-500:hover { color: #a855f7; }
+        .hover\:text-red-500:hover { color: #ef4444; }
+        .hover\:text-emerald-600:hover { color: #059669; }
+        
+        .hover\:border-slate-200:hover { border-color: #e2e8f0; }
+        
+        .active\:scale-95:active { transform: scale(0.95); }
+        .active\:scale-90:active { transform: scale(0.9); }
+
+        .focus\:outline-none:focus { outline: 2px solid transparent; outline-offset: 2px; }
+        .focus\:border-cyan-400:focus { border-color: #22d3ee; }
+        .focus\:border-blue-400:focus { border-color: #60a5fa; }
+        .placeholder\:text-indigo-300::placeholder { color: #a5b4fc; }
+        
+        .bg-clip-text { -webkit-background-clip: text; background-clip: text; }
+        .text-transparent { color: transparent; }
+
+        /* ========================================= */
+        /* Mapeo Exacto de Gradientes y Colores      */
+        /* (Para mantener arrays JS intactos)        */
+        /* ========================================= */
+
+        /* Gradientes para textos e iconos (to-r) */
+        .from-blue-700.to-purple-700 { background-image: linear-gradient(to right, #1d4ed8, #7e22ce); }
+        .from-purple-500.to-pink-500 { background-image: linear-gradient(to right, #a855f7, #ec4899); }
+        .from-cyan-400.to-blue-500 { background-image: linear-gradient(to right, #22d3ee, #3b82f6); }
+        .from-blue-500.to-indigo-600 { background-image: linear-gradient(to right, #3b82f6, #4f46e5); }
+        .from-purple-400.to-pink-500 { background-image: linear-gradient(to right, #c084fc, #ec4899); }
+        .from-red-500.to-rose-600 { background-image: linear-gradient(to right, #ef4444, #e11d48); }
+        .from-emerald-500.to-teal-600 { background-image: linear-gradient(to right, #10b981, #0d9488); }
+        .from-red-600.to-rose-600 { background-image: linear-gradient(to right, #dc2626, #e11d48); }
+        .from-emerald-600.to-teal-600 { background-image: linear-gradient(to right, #059669, #0d9488); }
+
+        /* Gradientes to-br para Icon3D y Hábitos */
+        .bg-gradient-to-br.from-cyan-400.to-blue-500 { background-image: linear-gradient(to bottom right, #22d3ee, #3b82f6); }
+        .bg-gradient-to-br.from-orange-400.to-amber-500 { background-image: linear-gradient(to bottom right, #fbbf24, #d97706); }
+        .bg-gradient-to-br.from-purple-400.to-indigo-500 { background-image: linear-gradient(to bottom right, #c084fc, #4f46e5); }
+        .bg-gradient-to-br.from-rose-400.to-red-500 { background-image: linear-gradient(to bottom right, #fb7185, #ef4444); }
+        .bg-gradient-to-br.from-purple-400.to-pink-500 { background-image: linear-gradient(to bottom right, #c084fc, #ec4899); }
+        .bg-gradient-to-br.from-emerald-400.to-teal-500 { background-image: linear-gradient(to bottom right, #34d399, #14b8a6); }
+        .bg-gradient-to-br.from-fuchsia-500.to-pink-500 { background-image: linear-gradient(to bottom right, #d946ef, #ec4899); }
+        .bg-gradient-to-br.from-slate-800.to-slate-900 { background-image: linear-gradient(to bottom right, #1e293b, #0f172a); }
+
+        /* Primeros Auxilios Gradients */
+        .bg-gradient-to-br.from-red-500.to-rose-600 { background-image: linear-gradient(to bottom right, #ef4444, #e11d48); }
+        .bg-gradient-to-br.from-orange-400.to-amber-600 { background-image: linear-gradient(to bottom right, #fbbf24, #d97706); }
+        .bg-gradient-to-br.from-red-600.to-red-800 { background-image: linear-gradient(to bottom right, #dc2626, #991b1b); }
+        .bg-gradient-to-br.from-orange-500.to-red-500 { background-image: linear-gradient(to bottom right, #f97316, #ef4444); }
+        .bg-gradient-to-br.from-purple-500.to-indigo-600 { background-image: linear-gradient(to bottom right, #a855f7, #4f46e5); }
+        .bg-gradient-to-br.from-blue-400.to-cyan-500 { background-image: linear-gradient(to bottom right, #60a5fa, #06b6d4); }
+        .bg-gradient-to-br.from-slate-400.to-slate-600 { background-image: linear-gradient(to bottom right, #94a3b8, #475569); }
+        .bg-gradient-to-br.from-emerald-400.to-green-600 { background-image: linear-gradient(to bottom right, #34d399, #16a34a); }
+        .bg-gradient-to-br.from-indigo-400.to-blue-600 { background-image: linear-gradient(to bottom right, #818cf8, #2563eb); }
+        .bg-gradient-to-br.from-yellow-400.to-amber-600 { background-image: linear-gradient(to bottom right, #facc15, #d97706); }
+        .bg-gradient-to-br.from-red-400.to-orange-500 { background-image: linear-gradient(to bottom right, #f87171, #f97316); }
+        .bg-gradient-to-br.from-cyan-300.to-blue-500 { background-image: linear-gradient(to bottom right, #67e8f9, #3b82f6); }
+
+        /* Signos Alarma Gradients (bg) */
+        .bg-gradient-to-br.from-blue-50.to-blue-100 { background-image: linear-gradient(to bottom right, #eff6ff, #dbeafe); }
+        .bg-gradient-to-br.from-red-50.to-red-100 { background-image: linear-gradient(to bottom right, #fef2f2, #fee2e2); }
+        .bg-gradient-to-br.from-purple-50.to-purple-100 { background-image: linear-gradient(to bottom right, #faf5ff, #f3e8ff); }
+        .bg-gradient-to-br.from-orange-50.to-orange-100 { background-image: linear-gradient(to bottom right, #fff7ed, #ffedd5); }
+        .bg-gradient-to-br.from-cyan-50.to-cyan-100 { background-image: linear-gradient(to bottom right, #ecfeff, #cffafe); }
+        .bg-gradient-to-br.from-teal-50.to-teal-100 { background-image: linear-gradient(to bottom right, #f0fdfa, #ccfbf1); }
+        .bg-gradient-to-br.from-slate-50.to-slate-200 { background-image: linear-gradient(to bottom right, #f8fafc, #e2e8f0); }
+        .bg-gradient-to-br.from-amber-50.to-orange-100 { background-image: linear-gradient(to bottom right, #fffbeb, #ffedd5); }
+        .bg-gradient-to-br.from-lime-50.to-lime-100 { background-image: linear-gradient(to bottom right, #f7fee7, #ecfccb); }
+        .bg-gradient-to-br.from-emerald-50.to-emerald-100 { background-image: linear-gradient(to bottom right, #ecfdf5, #d1fae5); }
+        .bg-gradient-to-br.from-pink-50.to-pink-100 { background-image: linear-gradient(to bottom right, #fdf2f8, #fce7f3); }
+        .bg-gradient-to-br.from-rose-50.to-rose-100 { background-image: linear-gradient(to bottom right, #fff1f2, #ffe4e6); }
+        .bg-gradient-to-br.from-violet-50.to-violet-100 { background-image: linear-gradient(to bottom right, #f5f3ff, #ede9fe); }
+        .bg-gradient-to-br.from-indigo-50.to-indigo-100 { background-image: linear-gradient(to bottom right, #eef2ff, #e0e7ff); }
+        .bg-gradient-to-br.from-yellow-50.to-yellow-100 { background-image: linear-gradient(to bottom right, #fefce8, #fef9c3); }
+        .bg-gradient-to-br.from-sky-50.to-sky-100 { background-image: linear-gradient(to bottom right, #f0f9ff, #e0f2fe); }
+        .bg-gradient-to-br.from-amber-50.to-amber-100 { background-image: linear-gradient(to bottom right, #fffbeb, #fef3c7); }
+
+        /* Recomendaciones bg-gradient-to-br */
+        .bg-gradient-to-br.from-pink-50.to-rose-100 { background-image: linear-gradient(to bottom right, #fdf2f8, #ffe4e6); }
+        .bg-gradient-to-br.from-teal-50.to-emerald-100 { background-image: linear-gradient(to bottom right, #f0fdfa, #d1fae5); }
+
+        /* Colores dinámicos para `text-` y reemplazo a `bg-` */
+        .text-blue-600 { color: #2563eb; } .bg-blue-600 { background-color: #2563eb; }
+        .text-red-600 { color: #dc2626; } .bg-red-600 { background-color: #dc2626; }
+        .text-purple-600 { color: #9333ea; } .bg-purple-600 { background-color: #9333ea; }
+        .text-orange-600 { color: #ea580c; } .bg-orange-600 { background-color: #ea580c; }
+        .text-cyan-600 { color: #0891b2; } .bg-cyan-600 { background-color: #0891b2; }
+        .text-teal-600 { color: #0d9488; } .bg-teal-600 { background-color: #0d9488; }
+        .text-stone-600 { color: #57534e; } .bg-stone-600 { background-color: #57534e; }
+        .text-orange-500 { color: #f97316; } .bg-orange-500 { background-color: #f97316; }
+        .text-lime-600 { color: #65a30d; } .bg-lime-600 { background-color: #65a30d; }
+        .text-emerald-600 { color: #059669; } .bg-emerald-600 { background-color: #059669; }
+        .text-pink-600 { color: #db2777; } .bg-pink-600 { background-color: #db2777; }
+        .text-rose-600 { color: #e11d48; } .bg-rose-600 { background-color: #e11d48; }
+        .text-violet-600 { color: #7c3aed; } .bg-violet-600 { background-color: #7c3aed; }
+        .text-indigo-600 { color: #4f46e5; } .bg-indigo-600 { background-color: #4f46e5; }
+        .text-yellow-600 { color: #ca8a04; } .bg-yellow-600 { background-color: #ca8a04; }
+        .text-amber-600 { color: #d97706; } .bg-amber-600 { background-color: #d97706; }
+        .text-blue-500 { color: #3b82f6; } .bg-blue-500 { background-color: #3b82f6; }
+        .text-red-500 { color: #ef4444; } .bg-red-500 { background-color: #ef4444; }
+        .text-emerald-500 { color: #10b981; } .bg-emerald-500 { background-color: #10b981; }
+        .text-green-600 { color: #16a34a; }
+        .text-green-700 { color: #15803d; }
+        .text-blue-100 { color: #dbeafe; }
+        .text-amber-900 { color: #78350f; }
+        .text-amber-800 { color: #92400e; }
+        .text-slate-900 { color: #0f172a; } .bg-slate-900 { background-color: #0f172a; }
+        .bg-purple-500 { background-color: #a855f7; }
+        .bg-pink-500 { background-color: #ec4899; }
+        .bg-orange-500 { background-color: #f97316; }
+        .bg-cyan-500 { background-color: #06b6d4; }
+        .bg-indigo-500 { background-color: #6366f1; }
+        .bg-teal-500 { background-color: #14b8a6; }
+
+        /* Utilidades de fondo con opacidad */
+        .bg-white { background-color: rgba(255, 255, 255, 1); }
+        .bg-white\/10 { background-color: rgba(255, 255, 255, 0.1); }
+        .bg-white\/20 { background-color: rgba(255, 255, 255, 0.2); }
+        .bg-white\/50 { background-color: rgba(255, 255, 255, 0.5); }
+        .bg-white\/60 { background-color: rgba(255, 255, 255, 0.6); }
+        .bg-white\/80 { background-color: rgba(255, 255, 255, 0.8); }
+        .bg-white\/90 { background-color: rgba(255, 255, 255, 0.9); }
+        .bg-slate-900\/60 { background-color: rgba(15, 23, 42, 0.6); }
+        .bg-blue-100 { background-color: #dbeafe; }
+        .bg-emerald-100 { background-color: #d1fae5; }
+        .bg-amber-50 { background-color: #fffbeb; }
+        .bg-red-50 { background-color: #fef2f2; }
+        .bg-slate-900 { background-color: #0f172a; }
+        .bg-slate-800 { background-color: #1e293b; }
+        .bg-slate-300 { background-color: #cbd5e1; }
+        
+        .backdrop-blur-sm { backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+        .backdrop-blur-md { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .backdrop-blur-lg { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .backdrop-blur-xl { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+        
+        .border-white { border-color: rgba(255, 255, 255, 1); }
+        .border-white\/20 { border-color: rgba(255, 255, 255, 0.2); }
+        .border-white\/40 { border-color: rgba(255, 255, 255, 0.4); }
+        .border-slate-50 { border-color: #f8fafc; }
+        .border-slate-100 { border-color: #f1f5f9; }
+        .border-green-100 { border-color: #dcfce7; }
+        .border-amber-200 { border-color: #fde68a; }
+        .border-red-400 { border-color: #f87171; }
+        .border-emerald-400 { border-color: #34d399; }
+        .border-transparent { border-color: transparent; }
+
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .w-16 { width: 4rem; }
+        .h-16 { height: 4rem; }
+        .w-12 { width: 3rem; }
+        .h-1\.5 { height: 0.375rem; }
+        .w-2 { width: 0.5rem; }
+        .h-2 { height: 0.5rem; }
+        .w-3 { width: 0.75rem; }
+        .h-3 { height: 0.75rem; }
+        .w-7 { width: 1.75rem; }
+        .h-7 { height: 1.75rem; }
+        .w-64 { width: 16rem; }
+        .h-64 { height: 16rem; }
+        .w-48 { width: 12rem; }
+        .h-48 { height: 12rem; }
+        
+        .blur-2xl { filter: blur(40px); }
+        .blur-3xl { filter: blur(64px); }
+        .opacity-5 { opacity: 0.05; }
+        .opacity-10 { opacity: 0.1; }
+        .opacity-50 { opacity: 0.5; }
+        .opacity-60 { opacity: 0.6; }
+        
+        .-top-10 { top: -2.5rem; }
+        .-right-10 { right: -2.5rem; }
+        .left-5 { left: 1.25rem; }
+        .top-5 { top: 1.25rem; }
+        .top-4 { top: 1rem; }
+        .right-4 { right: 1rem; }
+        .bottom-\[-20\%\] { bottom: -20%; }
+        .right-\[20\%\] { right: 20%; }
+        
+        .inline-block { display: inline-block; }
+        .block { display: block; }
+        .hidden { display: none; }
+        
+        .max-h-60 { max-height: 15rem; }
+        .max-h-\[92vh\] { max-height: 92vh; }
+        .overflow-y-auto { overflow-y: auto; }
+        
+        .aspect-video { aspect-ratio: 16 / 9; }
+        .italic { font-style: italic; }
+        
+        .pr-6 { padding-right: 1.5rem; }
+        .pl-14 { padding-left: 3.5rem; }
+        .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+        
+        .rounded-t-\[3rem\] { border-top-left-radius: 3rem; border-top-right-radius: 3rem; }
+    </style>
+    
+    <script>
+        // Configurar Babel para forzar el uso del "runtime clásico" y 
+        // evitar el error de importación de "react/jsx-runtime" en React 18.
+        Babel.registerPreset('react-classic', {
+            presets: [
+                [Babel.availablePresets['react'], { runtime: 'classic' }]
+            ]
+        });
+    </script>
+</head>
+<body class="text-slate-800">
+    <div id="root"></div>
+
+    <script type="text/babel" data-presets="react-classic">
+        const { useState, useMemo, useRef } = React;
+
+        const SVGIcon = ({ name, size = 24, color = "currentColor", className = "", fill = "none" }) => {
+            const paths = {
+                search: <path d="M21 21l-4.35-4.35M19 11a8 8 0 11-16 0 8 8 0 0116 0z" />,
+                heart: <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0016.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 002 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />,
+                stethoscope: <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3 M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4" />,
+                brain: <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 4.44-2.54z M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-4.44-2.54z" />,
+                zap: <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />,
+                droplets: <path d="M7 16.3c2.2 0 4-1.8 4-4 0-3.3-4-8-4-8s-4 4.7-4 8c0 2.2 1.8 4 4 4z" />,
+                moon: <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />,
+                apple: <path d="M12 20.94c1.88 0 3.05-1.12 4.14-1.12 1.06 0 2.21 1.02 4.2 1.02 1.76 0 2.66-1.38 2.66-1.38s-2.31-1.09-2.31-3.66c0-2.18 1.71-3.21 1.71-3.21s-1.57-2.11-3.75-2.11c-1.35 0-2.21.74-3.32.74-1.15 0-2.36-.78-3.48-.78-2.61 0-5.11 2.26-5.11 6.2 0 3.73 2.11 7.3 5.26 7.3z M12 8V2" />,
+                chevronRight: <path d="M9 18l6-6-6-6" />,
+                chevronLeft: <path d="M15 18l-6-6 6-6" />,
+                home: <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />,
+                book: <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />,
+                shield: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />,
+                thermometer: <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" />,
+                activity: <path d="M22 12h-4l-3 9L9 3l-3 9H2" />,
+                alert: <g><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></g>,
+                siren: <g><path d="M7 18v-6a5 5 0 1 1 10 0v6" /><path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v1z" /><path d="M12 7V4" /><path d="M9 4l2 2" /><path d="M15 4l-2 2" /></g>,
+                user: <g><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></g>,
+                plane: <path d="M2 12h20 M13 2l9 10-9 10 M2 12l5-5m-5 5l5 5" />,
+                flame: <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-2.246-3.726-2.67-4.23A9.628 9.628 0 0 1 6 2c-.085 2.917 1.17 6.13 2.5 8.5C9.4 12.06 9.5 12.5 9.5 13a1 1 0 0 1-1 1c-.55 0-1-.45-1-1 0-2.33.67-4.4 1.5-6.5.64 1.7 1.31 3.29 2 4.5 1.67 2.9 4 5 4 8.5a6 6 0 0 1-12 0c0-1.78.7-3.4 1.5-4.5" />,
+                bone: <path d="M17 10c.7-.7 1.69 0 2.5 0a2.5 2.5 0 1 0 0-5 .5.5 0 0 1-.5-.5 2.5 2.5 0 1 0-5 0c0 .81.7 1.8 0 2.5l-7 7c-.7.7-1.69 0-2.5 0a2.5 2.5 0 0 0 0 5c.28 0 .5.22.5.5a2.5 2.5 0 1 0 5 0c0-.81-.7-1.8 0-2.5Z" />,
+                pill: <path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z M8.5 8.5l7 7" />,
+                baby: <g><path d="M9 12h.01" /><path d="M15 12h.01" /><path d="M10 16c.5.3 1.2.5 2 .5s1.5-.2 2-.5" /><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1" /></g>,
+                chair: <path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3 M5 9h14 M5 9v11a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V9 M9 9v4 M15 9v4" />,
+                dumbbell: <g><path d="m6.5 6.5 11 11" /><path d="m21 21-1-1a6 6 0 0 0-8.5-8.5l-1-1" /><path d="m3 3 1 1a6 6 0 0 0 8.5 8.5l1 1" /></g>,
+                sun: <g><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /><path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" /></g>,
+                aidKit: <g><path d="M10 3h4a2 2 0 0 1 2 2v1h4a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4V5a2 2 0 0 1 2-2z M10 8V5h4v3 M12 11v6 M9 14h6" /></g>
+            };
+            return (
+                <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                    {paths[name] || paths.heart}
+                </svg>
+            );
+        };
+
+        // Componente visual 3D
+        const Icon3D = ({ name, gradient, shadow, size = 32 }) => (
+            <div className={`relative flex items-center justify-center w-16 h-16 rounded-[1.2rem] bg-gradient-to-br ${gradient} ${shadow} shadow-3d border border-white/40 transform transition-transform group-hover:-translate-y-2 group-hover:scale-110 overflow-hidden shrink-0`}>
+                <div className="absolute inset-0 icon-reflection rounded-[1.2rem]"></div>
+                <SVGIcon name={name} size={size} color="white" className="relative z-10 drop-shadow-md" />
+            </div>
+        );
+
+        const ENFERMEDADES = [
+            { id: 1, nombre: "Gripe (Influenza)", categoria: "Infecciosa", deteccion: "Fiebre alta repentina, dolores musculares profundos y tos seca.", prevencion: "Vacunación anual y lavado de manos frecuente.", queHacer: "Reposo e hidratación. Vigilancia de la respiración.", severidad: "Media" },
+            { id: 2, nombre: "Dengue", categoria: "Infecciosa", deteccion: "Dolor retro-ocular intenso, fiebre alta y fatiga extrema.", prevencion: "Eliminar recipientes con agua estancada y usar repelente.", queHacer: "Hidratación masiva. Prohibido usar aspirina o ibuprofeno.", severidad: "Alta" },
+            { id: 3, nombre: "Tuberculosis", categoria: "Infecciosa", deteccion: "Tos persistente por más de 15 días, sudores nocturnos y pérdida de peso.", prevencion: "Vacuna BCG y evitar hacinamiento en lugares poco ventilados.", queHacer: "Tratamiento largo supervisado por salud pública.", severidad: "Alta" },
+            { id: 4, nombre: "Meningitis Bacteriana", categoria: "Infecciosa", deteccion: "Rigidez nucal, fiebre muy alta, vómitos en proyectil y fotofobia.", prevencion: "Vacunación específica y evitar contacto con enfermos.", queHacer: "Urgencia hospitalaria inmediata; riesgo vital.", severidad: "Crítica" },
+            { id: 5, nombre: "Hepatitis A", categoria: "Infecciosa", deteccion: "Ictericia (ojos amarillos), orina oscura y heces claras.", prevencion: "Higiene alimentaria y lavado de manos post-baño.", queHacer: "Reposo absoluto y dieta libre de grasas.", severidad: "Media" },
+            { id: 6, nombre: "Hepatitis B", categoria: "Infecciosa", deteccion: "Dolor abdominal derecho y fatiga crónica progresiva.", prevencion: "Vacunación y uso de preservativos.", queHacer: "Control médico regular para evitar daño crónico.", severidad: "Crónica" },
+            { id: 7, nombre: "VIH / SIDA", categoria: "Infecciosa", deteccion: "Infecciones oportunistas frecuentes y ganglios inflamados.", prevencion: "Uso de preservativo y material de inyección estéril.", queHacer: "Terapia antirretroviral constante y control inmunológico.", severidad: "Crónica" },
+            { id: 8, nombre: "Cólera", categoria: "Infecciosa", deteccion: "Diarrea acuosa masiva ('agua de arroz') y deshidratación súbita.", prevencion: "Consumo de agua potable y alimentos bien cocidos.", queHacer: "Rehidratación oral o intravenosa urgente.", severidad: "Alta" },
+            { id: 9, nombre: "Malaria (Paludismo)", categoria: "Infecciosa", deteccion: "Fiebre intermitente intensa, escalofríos y sudoración profusa.", prevencion: "Mosquiteros impregnados y control de estancamientos.", queHacer: "Evaluación médica para tratamiento antipalúdico.", severidad: "Alta" },
+            { id: 10, nombre: "Rabia", categoria: "Infecciosa", deteccion: "Hidrofobia, confusión, salivación excesiva y espasmos.", prevencion: "Vacunación de mascotas y evitar animales silvestres.", queHacer: "Vacunación post-mordedura inmediata antes de síntomas.", severidad: "Crítica" },
+            { id: 11, nombre: "Zika", categoria: "Infecciosa", deteccion: "Fiebre leve, sarpullido y conjuntivitis sin secreción.", prevencion: "Control de mosquitos y protección en embarazadas.", queHacer: "Reposo y manejo de la fiebre con medios físicos.", severidad: "Media" },
+            { id: 12, nombre: "Chikungunya", categoria: "Infecciosa", deteccion: "Dolor articular debilitante que impide caminar derecho.", prevencion: "Eliminar criaderos de mosquito Aedes.", queHacer: "Hidratación y paños fríos en articulaciones.", severidad: "Media" },
+            { id: 13, nombre: "Fiebre Tifoidea", categoria: "Infecciosa", deteccion: "Fiebre prolongada, dolor abdominal y falta de apetito.", prevencion: "Lavado de manos y buena cocción de alimentos.", queHacer: "Antibioterapia específica bajo receta médica.", severidad: "Alta" },
+            { id: 14, nombre: "Tétanos", categoria: "Infecciosa", deteccion: "Rigidez muscular dolorosa, especialmente en la mandíbula.", prevencion: "Vacunación y refuerzos cada 10 años.", queHacer: "Atención hospitalaria urgente ante heridas sucias.", severidad: "Crítica" },
+            { id: 15, nombre: "Varicela", categoria: "Infecciosa", deteccion: "Ampollas con picor que aparecen por todo el cuerpo.", prevencion: "Vacunación en la infancia.", queHacer: "Evitar rascado para no dejar cicatrices ni infectar.", severidad: "Baja" },
+            { id: 16, nombre: "Sarampión", categoria: "Infecciosa", deteccion: "Fiebre alta, manchas blancas en boca y sarpullido rojo.", prevencion: "Vacuna Triple Viral.", queHacer: "Aislamiento y control de complicaciones respiratorias.", severidad: "Alta" },
+            { id: 17, nombre: "Mononucleosis", categoria: "Infecciosa", deteccion: "Garganta muy inflamada, fiebre y fatiga extrema.", prevencion: "Evitar compartir vasos o cubiertos con infectados.", queHacer: "Reposo prolongado e hidratación.", severidad: "Media" },
+            { id: 18, nombre: "Sífilis", categoria: "Infecciosa", deteccion: "Llaga indolora inicial (chancro) y luego manchas en piel.", prevencion: "Uso constante de preservativos.", queHacer: "Tratamiento médico inmediato para evitar daños neurológicos.", severidad: "Alta" },
+            { id: 19, nombre: "Gonorrea", categoria: "Infecciosa", deteccion: "Flujo genital amarillento y dolor al orinar.", prevencion: "Sexo seguro y chequeos regulares.", queHacer: "Tratamiento de pareja simultáneo.", severidad: "Media" },
+            { id: 20, nombre: "Fiebre Amarilla", categoria: "Infecciosa", deteccion: "Fiebre, dolor de espalda, ictericia y sangrado nasal.", prevencion: "Vacunación obligatoria para zonas de riesgo.", queHacer: "Soporte hospitalario intensivo.", severidad: "Alta" },
+
+            { id: 21, nombre: "Hipertensión Arterial", categoria: "Cardiovascular", deteccion: "Suele ser asintomática. Mareos o cefalea en picos.", prevencion: "Reducir sal y realizar actividad física diaria.", queHacer: "Monitoreo diario y control médico regular.", severidad: "Crónica" },
+            { id: 22, nombre: "Infarto de Miocardio", categoria: "Cardiovascular", deteccion: "Dolor opresivo en pecho, brazo izquierdo o mandíbula.", prevencion: "Dieta sana, no fumar y control de colesterol.", queHacer: "Llamar a emergencias inmediatamente.", severidad: "Crítica" },
+            { id: 23, nombre: "Arritmia", categoria: "Cardiovascular", deteccion: "Palpitaciones irregulares o sensación de aleteo.", prevencion: "Moderar estimulantes como cafeína y alcohol.", queHacer: "Estudio cardiológico (Electrocardiograma).", severidad: "Media" },
+            { id: 24, nombre: "Insuficiencia Cardíaca", categoria: "Cardiovascular", deteccion: "Falta de aire al esfuerzo e hinchazón de tobillos.", prevencion: "Controlar presión arterial y peso.", queHacer: "Control estricto de ingesta de líquidos.", severidad: "Alta" },
+            { id: 25, nombre: "Aneurisma", categoria: "Cardiovascular", deteccion: "A menudo sin síntomas hasta que hay ruptura (dolor súbito).", prevencion: "No fumar y controlar la tensión arterial.", queHacer: "Seguimiento médico especializado.", severidad: "Alta" },
+            { id: 26, nombre: "Aterosclerosis", categoria: "Cardiovascular", deteccion: "Dificultad circulatoria y dolor en piernas al caminar.", prevencion: "Dieta baja en grasas saturadas.", queHacer: "Control lipídico y caminatas regulares.", severidad: "Crónica" },
+            { id: 27, nombre: "Pericarditis", categoria: "Cardiovascular", deteccion: "Dolor agudo en pecho que mejora al inclinarse adelante.", prevencion: "Cuidado de infecciones virales.", queHacer: "Reposo y control de la inflamación.", severidad: "Media" },
+            { id: 28, nombre: "Várices", categoria: "Cardiovascular", deteccion: "Venas dilatadas en piernas y sensación de pesadez.", prevencion: "No estar mucho tiempo de pie; usar medias.", queHacer: "Elevación de piernas y ejercicio venoso.", severidad: "Baja" },
+            { id: 29, nombre: "Angina de Pecho", categoria: "Cardiovascular", deteccion: "Dolor torácico transitorio durante el esfuerzo físico.", prevencion: "Evitar tabaco y controlar el estrés.", queHacer: "Reposo inmediato y evaluación cardiológica.", severidad: "Alta" },
+            { id: 30, nombre: "Endocarditis", categoria: "Cardiovascular", deteccion: "Fiebre persistente y soplos cardíacos nuevos.", prevencion: "Profilaxis dental en personas de riesgo.", queHacer: "Tratamiento hospitalario prolongado.", severidad: "Alta" },
+            { id: 31, nombre: "Trombosis Venosa", categoria: "Cardiovascular", deteccion: "Hinchazón, calor y dolor en una sola pierna.", prevencion: "Caminar en viajes largos e hidratarse.", queHacer: "Evitar masajes en la zona y acudir a urgencias.", severidad: "Alta" },
+            { id: 32, nombre: "Valvulopatía", categoria: "Cardiovascular", deteccion: "Cansancio excesivo y ruidos cardíacos anormales.", prevencion: "Tratar anginas estreptocócicas en la infancia.", queHacer: "Seguimiento por ecocardiografía.", severidad: "Crónica" },
+            { id: 33, nombre: "Fibrilación Auricular", categoria: "Cardiovascular", deteccion: "Pulso totalmente irregular y acelerado.", prevencion: "Evitar alcohol y apnea del sueño.", queHacer: "Evaluación para prevenir coágulos sanguíneos.", severidad: "Alta" },
+            { id: 34, nombre: "Cardiopatía Congénita", categoria: "Cardiovascular", deteccion: "Cianosis (labios azules) y soplos en bebés.", prevencion: "Control prenatal riguroso.", queHacer: "Cirugía o manejo pediátrico especializado.", severidad: "Crónica" },
+            { id: 35, nombre: "Miocardiopatía", categoria: "Cardiovascular", deteccion: "Fatiga crónica y desmayos sin causa.", prevencion: "Evitar exceso de alcohol y toxinas.", queHacer: "Restricción de ejercicio intenso si se indica.", severidad: "Alta" },
+            { id: 36, nombre: "Hipertensión Pulmonar", categoria: "Cardiovascular", deteccion: "Falta de aire progresiva y labios azulados.", prevencion: "Evitar el uso de ciertos fármacos adelgazantes.", queHacer: "Tratamiento especializado en neumología/cardiología.", severidad: "Alta" },
+            { id: 37, nombre: "Prolapso Mitral", categoria: "Cardiovascular", deteccion: "Pinchazos en el pecho y palpitaciones.", prevencion: "No hay específica; controles periódicos.", queHacer: "Estilo de vida saludable y control del estrés.", severidad: "Media" },
+            { id: 38, nombre: "Arteritis", categoria: "Cardiovascular", deteccion: "Dolor en sienes y pérdida de visión temporal.", prevencion: "No conocida.", queHacer: "Consulta urgente para evitar ceguera.", severidad: "Alta" },
+            { id: 39, nombre: "Síncope Vasovagal", categoria: "Cardiovascular", deteccion: "Desmayo tras dolor, miedo o estar mucho de pie.", prevencion: "Mantenerse hidratado y evitar gatillos.", queHacer: "Recostarse con piernas elevadas si hay mareo.", severidad: "Baja" },
+            { id: 40, nombre: "Edema Pulmonar", categoria: "Cardiovascular", deteccion: "Tos con espuma rosada y falta de aire crítica.", prevencion: "Controlar la insuficiencia cardíaca.", queHacer: "Urgencia médica extrema.", severidad: "Crítica" },
+
+            { id: 41, nombre: "Diabetes Tipo 1", categoria: "Metabólica", deteccion: "Pérdida rápida de peso y sed intensa en jóvenes.", prevencion: "No conocida (autoinmune).", queHacer: "Terapia de administración de insulina constante.", severidad: "Crónica" },
+            { id: 42, nombre: "Diabetes Tipo 2", categoria: "Metabólica", deteccion: "Cansancio, visión borrosa y sed persistente.", prevencion: "Peso saludable y dieta baja en harinas.", queHacer: "Control alimenticio y ejercicio diario.", severidad: "Crónica" },
+            { id: 43, nombre: "Hipotiroidismo", categoria: "Metabólica", deteccion: "Piel seca, frío, fatiga y aumento de peso.", prevencion: "Consumo de yodo adecuado.", queHacer: "Seguimiento médico y hormonal.", severidad: "Crónica" },
+            { id: 44, nombre: "Hipertiroidismo", categoria: "Metabólica", deteccion: "Nerviosismo, pérdida de peso y palpitaciones.", prevencion: "No específica.", queHacer: "Regulación de la función tiroidea médica.", severidad: "Crónica" },
+            { id: 45, nombre: "Hipoglucemia", categoria: "Metabólica", deteccion: "Sudor frío, confusión y temblor súbito.", prevencion: "Evitar ayunos si se es diabético.", queHacer: "Tomar carbohidratos de absorción rápida.", severidad: "Alta" },
+            { id: 46, nombre: "Síndrome Metabólico", categoria: "Metabólica", deteccion: "Cintura ancha, presión alta y azúcar limítrofe.", prevencion: "Actividad física y alimentación sana.", queHacer: "Cambio total de estilo de vida.", severidad: "Media" },
+            { id: 47, nombre: "Dislipidemia", categoria: "Metabólica", deteccion: "Suele ser silenciosa. Se detecta en sangre.", prevencion: "Dieta baja en grasas saturadas.", queHacer: "Ejercicio y dieta controlada.", severidad: "Crónica" },
+            { id: 48, nombre: "Hiperuricemia (Ácido Úrico)", categoria: "Metabólica", deteccion: "Niveles altos en sangre; riesgo de gota.", prevencion: "Bajo consumo de carnes rojas y mariscos.", queHacer: "Hidratación abundante.", severidad: "Media" },
+            { id: 49, nombre: "Bocio", categoria: "Metabólica", deteccion: "Hinchazón notable en la base del cuello.", prevencion: "Sal yodada en la alimentación diaria.", queHacer: "Estudio de nódulos tiroideos.", severidad: "Media" },
+            { id: 50, nombre: "Fenilcetonuria", categoria: "Metabólica", deteccion: "Detectada en tamizaje neonatal.", prevencion: "Prueba del talón al nacer.", queHacer: "Dieta estricta sin fenilalanina.", severidad: "Crónica" },
+            { id: 51, nombre: "Enfermedad de Addison", categoria: "Metabólica", deteccion: "Piel bronceada sin sol y presión muy baja.", prevencion: "No hay específica.", queHacer: "Terapia de soporte hormonal vitalicia.", severidad: "Crónica" },
+            { id: 52, nombre: "Cushing", categoria: "Metabólica", deteccion: "Cara de luna llena y grasa en nuca.", prevencion: "Evitar uso prolongado de corticoides.", queHacer: "Evaluación endocrina profunda.", severidad: "Alta" },
+            { id: 53, nombre: "Osteomalacia", categoria: "Metabólica", deteccion: "Dolor óseo y debilidad muscular.", prevencion: "Sol y Vitamina D suficiente.", queHacer: "Suplementación supervisada.", severidad: "Media" },
+            { id: 54, nombre: "Galactosemia", categoria: "Metabólica", deteccion: "Rechazo a la leche y daño hepático en bebés.", prevencion: "Tamizaje neonatal.", queHacer: "Eliminación total de lactosa/galactosa.", severidad: "Alta" },
+            { id: 55, nombre: "Hemocromatosis", categoria: "Metabólica", deteccion: "Exceso de hierro en sangre y piel grisácea.", prevencion: "Genético; control familiar.", queHacer: "Sangrías terapéuticas médicas.", severidad: "Crónica" },
+            
+            { id: 56, nombre: "Asma", categoria: "Respiratoria", deteccion: "Silbidos al respirar y opresión en el pecho.", prevencion: "Evitar humo, polvo y ácaros.", queHacer: "Técnica de inhalación correcta siempre.", severidad: "Crónica" },
+            { id: 57, nombre: "EPOC", categoria: "Respiratoria", deteccion: "Tos de fumador crónica y falta de aire.", prevencion: "No fumar bajo ninguna circunstancia.", queHacer: "Oxigenoterapia y rehabilitación física.", severidad: "Crónica" },
+            { id: 58, nombre: "Neumonía", categoria: "Respiratoria", deteccion: "Fiebre, tos con flema y dolor al respirar.", prevencion: "Vacuna antineumocócica y antigripal.", queHacer: "Atención médica para control de infección.", severidad: "Alta" },
+            { id: 59, nombre: "Bronquitis Aguda", categoria: "Respiratoria", deteccion: "Tos irritativa tras un resfriado común.", prevencion: "Lavado de manos y evitar aire frío.", queHacer: "Vahos, hidratación y reposo.", severidad: "Media" },
+            { id: 60, nombre: "Sinusitis", categoria: "Respiratoria", deteccion: "Dolor en pómulos y frente con congestión.", prevencion: "Tratar bien las alergias nasales.", queHacer: "Lavados con solución salina.", severidad: "Baja" },
+            { id: 61, nombre: "Faringitis", categoria: "Respiratoria", deteccion: "Dolor de garganta intenso al tragar.", prevencion: "Evitar cambios bruscos de clima.", queHacer: "Gárgaras y bebidas tibias.", severidad: "Baja" },
+            { id: 62, nombre: "Apnea del Sueño", categoria: "Respiratoria", deteccion: "Ronquidos y pausas de aire al dormir.", prevencion: "Bajar de peso y evitar alcohol nocturno.", queHacer: "Estudio de sueño y uso de CPAP.", severidad: "Media" },
+            { id: 63, nombre: "Bronquiolitis", categoria: "Respiratoria", deteccion: "Dificultad para respirar en bebés menores de 2 años.", prevencion: "Evitar contacto con personas resfriadas.", queHacer: "Vigilancia de signos de alarma (hundir costillas).", severidad: "Alta" },
+            { id: 64, nombre: "Enfisema", categoria: "Respiratoria", deteccion: "Tórax en forma de barril y fatiga extrema.", prevencion: "Ambientes libres de humo y polución.", queHacer: "Broncodilatadores y evitar esfuerzos excesivos.", severidad: "Crónica" },
+            { id: 65, nombre: "Rinitis Alérgica", categoria: "Respiratoria", deteccion: "Estornudos seguidos y picor de nariz.", prevencion: "Identificar y evitar el alérgeno (polen, pelo).", queHacer: "Higiene nasal y antihistamínicos según indicación.", severidad: "Baja" },
+            { id: 66, nombre: "Faringoamigdalitis", categoria: "Respiratoria", deteccion: "Placas blancas en la garganta y fiebre.", prevencion: "No compartir utensilios de comida.", queHacer: "Reposo y dieta blanda líquida.", severidad: "Media" },
+            { id: 67, nombre: "Laringitis", categoria: "Respiratoria", deteccion: "Tos perruna y pérdida de voz.", prevencion: "No forzar la voz en ambientes secos.", queHacer: "Humidificar el aire y reposo vocal.", severidad: "Baja" },
+            { id: 68, nombre: "Derrame Pleural", categoria: "Respiratoria", deteccion: "Dolor punzante que impide respirar hondo.", prevencion: "Controlar enfermedades pulmonares previas.", queHacer: "Drenaje médico hospitalario.", severidad: "Alta" },
+            { id: 69, nombre: "Embolia Pulmonar", categoria: "Respiratoria", deteccion: "Dolor súbito y falta de aire crítica.", prevencion: "Moverse tras cirugías y en viajes largos.", queHacer: "Urgencia hospitalaria inmediata.", severidad: "Crítica" },
+            { id: 70, nombre: "Fibrosis Pulmonar", categoria: "Respiratoria", deteccion: "Tos seca y dedos en 'palillo de tambor'.", prevencion: "Protección laboral ante polvos inorgánicos.", queHacer: "Control con neumología de por vida.", severidad: "Crónica" },
+            { id: 71, nombre: "Crup Laringeo", categoria: "Respiratoria", deteccion: "Tos metálica y estridor en niños de noche.", prevencion: "Higiene y vacunas al día.", queHacer: "Aire fresco y mantener la calma del niño.", severidad: "Media" },
+            { id: 72, nombre: "Sarcoidosis", categoria: "Respiratoria", deteccion: "Tos, fatiga y manchas rojas en las piernas.", prevencion: "No conocida.", queHacer: "Monitoreo de función pulmonar.", severidad: "Crónica" },
+            { id: 73, nombre: "Bronquiectasias", categoria: "Respiratoria", deteccion: "Mucha flema diaria y tos crónica.", prevencion: "Tratar bien las infecciones de la infancia.", queHacer: "Kinesiología respiratoria diaria.", severidad: "Crónica" },
+            { id: 74, nombre: "Aspergilosis", categoria: "Respiratoria", deteccion: "Tos con sangre en personas inmunodeprimidas.", prevencion: "Evitar zonas con moho o construcción.", queHacer: "Tratamiento antifúngico especializado.", severidad: "Alta" },
+            { id: 75, nombre: "Pleuritis", categoria: "Respiratoria", deteccion: "Puntada de costado muy fuerte al toser.", prevencion: "Controlar gripes y resfriados.", queHacer: "Calor local y reposo.", severidad: "Media" },
+
+            { id: 76, nombre: "Gastritis", categoria: "Digestiva", deteccion: "Ardor en la boca del estómago.", prevencion: "Evitar irritantes y alcohol.", queHacer: "Fraccionar comidas.", severidad: "Media" },
+            { id: 77, nombre: "Celiaquía", categoria: "Digestiva", deteccion: "Diarrea y dolor tras comer gluten.", prevencion: "Ninguna; base genética.", queHacer: "Dieta 100% sin gluten.", severidad: "Crónica" },
+            { id: 78, nombre: "Reflujo (ERGE)", categoria: "Digestiva", deteccion: "Acidez que sube a la garganta tras comer.", prevencion: "Cenas ligeras y evitar tabaco.", queHacer: "No acostarse hasta 2 horas tras comer.", severidad: "Media" },
+            { id: 79, nombre: "Colitis Ulcerosa", categoria: "Digestiva", deteccion: "Diarrea con sangre y urgencia evacuatoria.", prevencion: "No conocida.", queHacer: "Dieta baja en residuos en brotes.", severidad: "Crónica" },
+            { id: 80, nombre: "Enfermedad de Crohn", categoria: "Digestiva", deteccion: "Dolor abdominal fuerte y fístulas.", prevencion: "Estilo de vida sin estrés ni tabaco.", queHacer: "Control con gastroenterología.", severidad: "Crónica" },
+            { id: 81, nombre: "Colon Irritable", categoria: "Digestiva", deteccion: "Hinchazón, gases y cambios en evacuación.", prevencion: "Gestión del estrés y dieta equilibrada.", queHacer: "Dieta personalizada (FODMAP).", severidad: "Media" },
+            { id: 82, nombre: "Estreñimiento", categoria: "Digestiva", deteccion: "Heces duras y dificultad para evacuar.", prevencion: "Más fibra vegetal y mucha agua.", queHacer: "Caminar más y crear hábito horario.", severidad: "Baja" },
+            { id: 83, nombre: "Hemorroides", categoria: "Digestiva", deteccion: "Sangrado rectal rojo vivo y picor.", prevencion: "Evitar el sedentarismo y estreñimiento.", queHacer: "Baños de asiento con agua tibia.", severidad: "Baja" },
+            { id: 84, nombre: "Cálculos Biliares", categoria: "Digestiva", deteccion: "Dolor agudo en el lado derecho tras comer grasas.", prevencion: "Mantener peso estable.", queHacer: "Consultar por posible cirugía (Vesícula).", severidad: "Media" },
+            { id: 85, nombre: "Pancreatitis Aguda", categoria: "Digestiva", deteccion: "Dolor 'en cinturón' muy fuerte que va a la espalda.", prevencion: "Evitar alcohol y exceso de grasas.", queHacer: "Urgencia hospitalaria absoluta.", severidad: "Alta" },
+            { id: 86, nombre: "Cirrosis", categoria: "Hepática", deteccion: "Abdomen muy hinchado y ojos amarillos.", prevencion: "Vacuna Hepatitis y cero alcohol.", queHacer: "Seguimiento médico riguroso.", severidad: "Alta" },
+            { id: 87, nombre: "Úlcera Gástrica", categoria: "Digestiva", deteccion: "Dolor punzante cuando el estómago está vacío.", prevencion: "Evitar exceso de aspirinas/ibuprofeno.", queHacer: "Control de bacteria H. pylori.", severidad: "Media" },
+            { id: 88, nombre: "Diverticulitis", categoria: "Digestiva", deteccion: "Dolor en el lado inferior izquierdo y fiebre.", prevencion: "Dieta alta en fibra siempre.", queHacer: "Dieta líquida y reposo intestinal.", severidad: "Alta" },
+            { id: 89, nombre: "Hepatitis Alcohólica", categoria: "Hepática", deteccion: "Hígado inflamado y dolor tras beber.", prevencion: "Abstinencia total de alcohol.", queHacer: "Apoyo nutricional y médico.", severidad: "Alta" },
+            { id: 90, nombre: "Fisura Anal", categoria: "Digestiva", deteccion: "Dolor cortante al evacuar.", prevencion: "Evitar heces duras con mucha fibra.", queHacer: "Higiene suave y cremas cicatrizantes.", severidad: "Baja" },
+            { id: 91, nombre: "Gastroenteritis", categoria: "Digestiva", deteccion: "Vómitos y diarrea súbitos.", prevencion: "Lavar bien frutas y manos.", queHacer: "Rehidratación con suero oral constante.", severidad: "Media" },
+            { id: 92, nombre: "Intolerancia Lactosa", categoria: "Digestiva", deteccion: "Gases y diarrea tras tomar leche.", prevencion: "No aplica.", queHacer: "Sustituir lácteos o usar lactasa.", severidad: "Baja" },
+            { id: 93, nombre: "Hernia de Hiato", categoria: "Digestiva", deteccion: "Dificultad al tragar y mucha acidez.", prevencion: "Evitar sobrepeso.", queHacer: "Comidas pequeñas y no tumbarse.", severidad: "Media" },
+            { id: 94, nombre: "Giardiasis", categoria: "Infecciosa", deteccion: "Gases con mal olor y heces grasas.", prevencion: "Agua potable siempre.", queHacer: "Tratamiento desparasitante médico.", severidad: "Baja" },
+            { id: 95, nombre: "Hígado Graso", categoria: "Hepática", deteccion: "Pesadez en el abdomen derecho y fatiga.", prevencion: "Evitar exceso de fructosa y alcohol.", queHacer: "Ejercicio físico y dieta sana.", severidad: "Crónica" },
+
+            { id: 96, nombre: "Depresión", categoria: "Mental", deteccion: "Tristeza profunda y falta de energía constante.", prevencion: "Vínculos sociales y ejercicio.", queHacer: "Psicoterapia profesional.", severidad: "Alta" },
+            { id: 97, nombre: "Ansiedad", categoria: "Mental", deteccion: "Palpitaciones, miedo y tensión muscular.", prevencion: "Mindfulness y límites sanos.", queHacer: "Respiración consciente y terapia.", severidad: "Media" },
+            { id: 98, nombre: "Trastorno Bipolar", categoria: "Mental", deteccion: "Ciclos de euforia extrema y depresión profunda.", prevencion: "Horarios de sueño estrictos.", queHacer: "Tratamiento psiquiátrico estable.", severidad: "Alta" },
+            { id: 99, nombre: "Esquizofrenia", categoria: "Mental", deteccion: "Alucinaciones y delirios.", prevencion: "Evitar consumo de drogas.", queHacer: "Apoyo familiar y médico constante.", severidad: "Alta" },
+            { id: 100, nombre: "TDAH", categoria: "Mental", deteccion: "Inatención severa e impulsividad.", prevencion: "Detección temprana.", queHacer: "Terapia conductual y organización.", severidad: "Crónica" },
+            { id: 101, nombre: "TOC", categoria: "Mental", deteccion: "Obsesiones y rituales repetitivos.", prevencion: "Gestión temprana de la ansiedad.", queHacer: "Terapia de exposición.", severidad: "Crónica" },
+            { id: 102, nombre: "Ataque de Pánico", categoria: "Mental", deteccion: "Siento que muero o me vuelvo loco súbitamente.", prevencion: "Aprender técnicas de relajación.", queHacer: "Recordar que es temporal y respirar.", severidad: "Media" },
+            { id: 103, nombre: "Fobia Social", categoria: "Mental", deteccion: "Miedo paralizante a ser juzgado por otros.", prevencion: "Habilidades sociales progresivas.", queHacer: "Desensibilización psicológica.", severidad: "Media" },
+            { id: 104, nombre: "Anorexia", categoria: "Mental", deteccion: "Distorsión de imagen y no comer.", prevencion: "Autoestima y educación crítica.", queHacer: "Apoyo multidisciplinario urgente.", severidad: "Alta" },
+            { id: 105, nombre: "Bulimia", categoria: "Mental", deteccion: "Atracones y purgas posteriores.", prevencion: "Salud emocional.", queHacer: "Psicoterapia y nutrición.", severidad: "Alta" },
+            { id: 106, nombre: "Estrés Postraumático", categoria: "Mental", deteccion: "Flashbacks de un evento terrible.", prevencion: "Apoyo psicológico tras trauma.", queHacer: "Terapia EMDR.", severidad: "Alta" },
+            { id: 107, nombre: "Insomnio Crónico", categoria: "Mental", deteccion: "Dificultad persistente para dormir.", prevencion: "Higiene del sueño.", queHacer: "Restricción de sueño guiada.", severidad: "Media" },
+            { id: 108, nombre: "Trastorno de Personalidad", categoria: "Mental", deteccion: "Patrones de conducta que causan gran conflicto.", prevencion: "Entorno estable.", queHacer: "Terapia de larga duración.", severidad: "Alta" },
+            { id: 109, nombre: "Adicción (Sustancias)", categoria: "Mental", deteccion: "Necesidad compulsiva de consumo.", prevencion: "Información y red familiar.", queHacer: "Desintoxicación y rehabilitación.", severidad: "Alta" },
+            { id: 110, nombre: "Demencia", categoria: "Mental", deteccion: "Confusión y pérdida de capacidades mentales.", prevencion: "Vida mentalmente activa.", queHacer: "Cuidado amoroso y estimulación.", severidad: "Alta" },
+
+            { id: 111, nombre: "Alzheimer", categoria: "Neurológica", deteccion: "Olvidos de cosas recientes y desorientación.", prevencion: "Aprender idiomas, leer, jugar.", queHacer: "Rutinas claras en casa.", severidad: "Alta" },
+            { id: 112, nombre: "Parkinson", categoria: "Neurológica", deteccion: "Temblor en reposo y rigidez al caminar.", prevencion: "No conocida; ejercicio ayuda.", queHacer: "Terapia de rehabilitación física.", severidad: "Alta" },
+            { id: 113, nombre: "Migraña", categoria: "Neurológica", deteccion: "Dolor pulsátil intensely náuseas.", prevencion: "Identificar disparadores alimentarios.", queHacer: "Lugar oscuro y silencio.", severidad: "Media" },
+            { id: 114, nombre: "Epilepsia", categoria: "Neurológica", deteccion: "Convulsiones o ausencias.", prevencion: "Dormir bien y evitar luces parpadeantes.", queHacer: "Poner de lado y proteger la cabeza.", severidad: "Crónica" },
+            { id: 115, nombre: "Esclerosis Múltiple", categoria: "Neurológica", deteccion: "Hormigueo y debilidad en piernas o brazos.", prevencion: "No conocida.", queHacer: "Seguimiento neurológico especializado.", severidad: "Crónica" },
+            { id: 116, nombre: "Ictus (ACV)", categoria: "Neurológica", deteccion: "Cara caída, brazo débil o habla rara.", prevencion: "Control de presión y colesterol.", queHacer: "URGENCIA. Cada minuto cuenta.", severidad: "Crítica" },
+            { id: 117, nombre: "Neuropatía Diabética", categoria: "Neurológica", deteccion: "Quemazón o entumecimiento en pies.", prevencion: "Controlar niveles de azúcar.", queHacer: "Revisar pies diariamente por heridas.", severidad: "Crónica" },
+            { id: 118, nombre: "Mielitis Transversa", categoria: "Neurológica", deteccion: "Parálisis de piernas rápida.", prevencion: "No conocida.", queHacer: "Internación hospitalaria.", severidad: "Alta" },
+            { id: 119, nombre: "Vértigo", categoria: "Neurológica", deteccion: "Siento que todo da vueltas al moverme.", prevencion: "No mover la cabeza bruscamente.", queHacer: "Maniobras de reposicionamiento.", severidad: "Baja" },
+            { id: 120, nombre: "Estatus Epiléptico", categoria: "Neurológica", deteccion: "Convulsión que no para en 5 minutos.", prevencion: "No saltar dosis de medicación.", queHacer: "Llamar ambulancia urgente.", severidad: "Crítica" },
+
+            { id: 121, nombre: "Dermatitis Atópica", categoria: "Dermatológica", deteccion: "Zonas rojas con mucho picor.", prevencion: "Hidratar la piel tras el baño.", queHacer: "Cremas neutras e hidratación.", severidad: "Baja" },
+            { id: 122, nombre: "Psoriasis", categoria: "Dermatológica", deteccion: "Placas con escamas plateadas.", prevencion: "Controlar el estrés emocional.", queHacer: "Fototerapia controlada.", severidad: "Crónica" },
+            { id: 123, nombre: "Vitíligo", categoria: "Dermatológica", deteccion: "Manchas blancas en la piel.", prevencion: "No conocida.", queHacer: "Protector solar alto.", severidad: "Baja" },
+            { id: 124, nombre: "Acné Severo", categoria: "Dermatológica", deteccion: "Granos con quistes y cicatrices.", prevencion: "Limpieza facial.", queHacer: "No apretar; consulta dermatológica.", severidad: "Baja" },
+            { id: 125, nombre: "Urticaria", categoria: "Dermatológica", deteccion: "Ronchas rojas que pican mucho.", prevencion: "Identificar alérgeno.", queHacer: "Compresas frías.", severidad: "Baja" },
+            { id: 126, nombre: "Rosácea", categoria: "Dermatológica", deteccion: "Cara roja persistente con venitas.", prevencion: "Evitar alcohol y picantes.", queHacer: "Cuidado solar estricto.", severidad: "Baja" },
+            { id: 127, nombre: "Sarna", categoria: "Dermatológica", deteccion: "Picor insoportable de noche entre dedos.", prevencion: "Higiene y evitar ropa ajena.", queHacer: "Tratamiento a toda la familia.", severidad: "Baja" },
+            { id: 128, nombre: "Alopecia Areata", categoria: "Dermatológica", deteccion: "Círculos sin pelo en la cabeza.", prevencion: "Gestión del estrés.", queHacer: "Consulta médica capilar.", severidad: "Baja" },
+            { id: 129, nombre: "Impétigo", categoria: "Dermatológica", deteccion: "Costras color miel alrededor de la boca.", prevencion: "No compartir toallas.", queHacer: "Higiene y limpieza con agua tibia.", severidad: "Baja" },
+            { id: 130, nombre: "Melanoma", categoria: "Oncológica", deteccion: "Lunar que crece o cambia de color.", prevencion: "Revisión anual de lunares.", queHacer: "Biopsia urgente.", severidad: "Alta" },
+
+            { id: 131, nombre: "Artritis Reumatoide", categoria: "Articular", deteccion: "Manos hinchadas y rígidas de mañana.", prevencion: "No fumar.", queHacer: "Control con reumatología.", severidad: "Crónica" },
+            { id: 132, nombre: "Osteoporosis", categoria: "Ósea", deteccion: "Me quebré un hueso de la nada.", prevencion: "Calcio y Vitamina D.", queHacer: "Ejercicio de fuerza.", severidad: "Crónica" },
+            { id: 133, nombre: "Gota", categoria: "Articular", deteccion: "Dedo gordo rojo e intocable.", prevencion: "Bajar carnes y alcohol.", queHacer: "Mucha agua.", severidad: "Media" },
+            { id: 134, nombre: "Escoliosis", categoria: "Ósea", deteccion: "Espalda chueca vista de atrás.", prevencion: "Control pediátrico.", queHacer: "Natación y postura.", severidad: "Baja" },
+            { id: 135, nombre: "Hernia Discal", categoria: "Ósea", deteccion: "Dolor que baja por la pierna.", prevencion: "Cargar peso con las rodillas.", queHacer: "Fisioterapia.", severidad: "Media" },
+            { id: 136, nombre: "Juanetes (Hallux Valgus)", categoria: "Ósea", deteccion: "Bulto en base del dedo gordo.", prevencion: "Zapatos anchos.", queHacer: "Separadores y calzado cómodo.", severidad: "Baja" },
+            { id: 137, nombre: "Osteoartritis", categoria: "Articular", deteccion: "Dolor al mover la rodilla o cadera.", prevencion: "Mantener peso sano.", queHacer: "Actividad de bajo impacto.", severidad: "Crónica" },
+            { id: 138, nombre: "Lupus", categoria: "General", deteccion: "Dolor en articulaciones y manchas cara.", prevencion: "Evitar sol fuerte.", queHacer: "Control médico.", severidad: "Crónica" },
+            { id: 139, nombre: "Bursitis", categoria: "Articular", deteccion: "Bulto blando doloroso en codo o rodilla.", prevencion: "No apoyar mucho tiempo.", queHacer: "Reposo e hielo local.", severidad: "Baja" },
+            { id: 140, nombre: "Túnel Carpiano", categoria: "Articular", deteccion: "Hormigueo en dedos al usar teclado.", prevencion: "Postura de manos recta.", queHacer: "Muñequera nocturna.", severidad: "Baja" },
+
+            { id: 141, nombre: "Otitis Externa", categoria: "Auditiva", deteccion: "Dolor al tocarse la oreja.", prevencion: "Secar bien tras piscina.", queHacer: "No meter hisopos.", severidad: "Baja" },
+            { id: 142, nombre: "Sordera Brusca", categoria: "Auditiva", deteccion: "Dejé de oír de un momento a otro.", prevencion: "Evitar ruidos extremos.", queHacer: "URGENCIA médica. No esperar.", severidad: "Alta" },
+            { id: 143, nombre: "Gingivitis", categoria: "Bucal", deteccion: "Encía sangra al cepillar.", prevencion: "Hilo dental diario.", queHacer: "Limpieza profesional.", severidad: "Baja" },
+            { id: 144, nombre: "Caries Profunda", categoria: "Bucal", deteccion: "Dolor punzante con dulces o frío.", prevencion: "Menos azúcar.", queHacer: "Tratamiento dental.", severidad: "Baja" },
+            { id: 145, nombre: "Cistitis", categoria: "Urinaria", deteccion: "Ardor al orinar y urgencia constante.", prevencion: "Higiene y beber mucha agua.", queHacer: "Urocultivo médico.", severidad: "Baja" },
+            { id: 146, nombre: "Cálculo Renal", categoria: "Urinaria", deteccion: "Dolor lumbar intenso que baja a la ingle.", prevencion: "Beber agua abundante.", queHacer: "Analgesia hospitalaria.", severidad: "Alta" },
+            { id: 147, nombre: "Cáncer Mama", categoria: "Oncológica", deteccion: "Nódulo duro en el pecho o cambio en pezón.", prevencion: "Mamografía anual.", queHacer: "Consulta inmediata.", severidad: "Alta" },
+            { id: 148, nombre: "Cáncer Pulmón", categoria: "Oncológica", deteccion: "Tos crónica, a veces con sangre.", prevencion: "NO FUMAR.", queHacer: "Control oncológico.", severidad: "Alta" },
+            { id: 149, nombre: "Escorbuto", categoria: "Nutricional", deteccion: "Hematomas fáciles y encías sangrantes.", prevencion: "Vitamina C (frutas cítricas).", queHacer: "Mejorar dieta nutricional.", severidad: "Media" },
+            { id: 150, nombre: "Hidrocefalia", categoria: "Neurológica", deteccion: "Cabeza crece anormalmente en bebés.", prevencion: "Ácido fólico prenatal.", queHacer: "Drenaje quirúrgico.", severidad: "Alta" }
+        ];
+
+        const HABITOS = [
+            { id: 1, titulo: "Hidratación", desc: "El agua regula la presión y lubrica.", icono: "droplets", gradient: "from-cyan-400 to-blue-500", shadow: "shadow-glow-blue", detalles: "El 70% de tu cerebro es agua. Beber 2L diarios mejora el drenaje linfático renal, previene migrañas y optimiza la elasticidad de la piel. Consejo: Bebe 500ml al despertar." },
+            { id: 2, titulo: "Nutrición", desc: "Regla 80/20: Alimentos Reales.", icono: "apple", gradient: "from-orange-400 to-amber-500", shadow: "shadow-glow-amber", detalles: "La fibra vegetal alimenta tu microbiota, esencial para el sistema inmune. Evita azúcares refinados para proteger tu páncreas e inflamación celular." },
+            { id: 3, titulo: "Descanso", desc: "Reparación sistémica nocturna.", icono: "moon", gradient: "from-purple-400 to-indigo-500", shadow: "shadow-glow-purple", detalles: "Dormir menos de 7 horas triplica el riesgo de infecciones. La oscuridad total permite producir melatonina, un potente antioxidante celular y antienvejecimiento." },
+            { id: 4, titulo: "Movimiento", desc: "El músculo es medicina metabólica.", icono: "activity", gradient: "from-rose-400 to-red-500", shadow: "shadow-glow-rose", detalles: "150 min de ejercicio moderado reduce riesgo de infarto en un 30%. El entrenamiento de fuerza mantiene la densidad ósea y previene la diabetes." }
+        ];
+
+        const RECOMENDACIONES = {
+            mujeres: [
+                "Mamografía anual a partir de los 40 años.",
+                "Citología vaginal (Papanicolaou) cada 3 años.",
+                "Autoexamen de mama mensual.",
+                "Suplementación con ácido fólico en edad fértil.",
+                "Vacunación contra el VPH.",
+                "Control de densidad ósea post-menopausia."
+            ],
+            hombres: [
+                "Examen de próstata anual a partir de los 50 años.",
+                "Autoexamen testicular mensual.",
+                "Control de presión arterial periódico.",
+                "Evitar el consumo excesivo de alcohol.",
+                "Control de colesterol y triglicéridos anual."
+            ],
+            general: [
+                "Vacuna contra la fiebre amarilla para zonas tropicales.",
+                "Refuerzo de vacuna antitetánica cada 10 años.",
+                "Uso diario de protector solar (FPS 30+).",
+                "Chequeo médico general anual.",
+                "Higiene dental (cepillado y seda) 3 veces al día.",
+                "Lavado de manos frecuente (mínimo 20 segundos).",
+                "Uso de cinturón de seguridad en vehículos."
+            ],
+            mental: [
+                "Dormir entre 7 y 9 horas diarias.",
+                "Practicar técnicas de respiración o meditación.",
+                "Mantener redes de apoyo social y familiar.",
+                "Desconectarse de pantallas 1 hora antes de dormir.",
+                "Buscar ayuda profesional si la tristeza persiste."
+            ],
+            nutricional: [
+                "Consumir 5 porciones de frutas y verduras al día.",
+                "Reducir el consumo de alimentos ultraprocesados.",
+                "Beber al menos 8 vasos de agua al día.",
+                "Moderar el consumo de sal y azúcares añadidos.",
+                "Preferir grasas saludables (aguacate, nueces, oliva)."
+            ],
+            estudio: [
+                "Regla 20-20-20 para salud visual frente a pantallas.",
+                "Pausas activas de 5 minutos cada hora de estudio.",
+                "Mantener la espalda recta y pies apoyados al sentarse.",
+                "Iluminación adecuada para evitar fatiga ocular.",
+                "Alternar posturas (sentado/de pie) si es posible."
+            ],
+            fisica: [
+                "Realizar al menos 150 minutos de actividad aeróbica semanal.",
+                "Incluir ejercicios de fuerza muscular 2 días por semana.",
+                "Realizar estiramientos antes y después del ejercicio.",
+                "Mantenerse hidratado antes, durante y después del deporte.",
+                "Elegir actividades placenteras para mantener la constancia."
+            ]
+        };
+
+        const SIGNOS_ALARMA = [
+            {
+                categoria: "Emergencia Respiratoria",
+                icono: "activity",
+                color: "text-blue-600",
+                bg: "from-blue-50 to-blue-100",
+                sintomas: [
+                    "Dificultad para respirar.",
+                    "Sensación de ahogo.",
+                    "Agitación respiratoria.",
+                    "Labios y falanges con tono azulado."
+                ]
+            },
+            {
+                categoria: "Emergencia Cardiovascular",
+                icono: "heart",
+                color: "text-red-600",
+                bg: "from-red-50 to-red-100",
+                sintomas: [
+                    "Palpitaciones fuertes y rápidas.",
+                    "Sudoración fría inexplicable.",
+                    "Dificultad para respirar.",
+                    "Dolor o presión en el pecho (posiblemente irradiado a la mano izquierda, cuello)."
+                ]
+            },
+            {
+                categoria: "Emergencia Neurológica",
+                icono: "brain",
+                color: "text-purple-600",
+                bg: "from-purple-50 to-purple-100",
+                sintomas: [
+                    "Dolor de cabeza intenso (puede estar acompañado de nauseas o vomito).",
+                    "Debilidad o perdida de la fuerza en algún lado del cuerpo.",
+                    "Desorientación o pérdida de memoria.",
+                    "Perdida de conciencia (desmayo).",
+                    "Convulsiones."
+                ]
+            },
+             {
+                categoria: "Emergencia Digestiva",
+                icono: "apple", 
+                color: "text-orange-600",
+                bg: "from-orange-50 to-orange-100",
+                sintomas: [
+                    "Vómitos o diarrea intensa.",
+                    "Dolor abdominal que impida la marcha.",
+                    "Sangrado inexplicable en las heces.",
+                    "Calambres muy fuertes después de comer."
+                ]
+            },
+            {
+                categoria: "Emergencia Urinaria",
+                icono: "droplets", 
+                color: "text-cyan-600",
+                bg: "from-cyan-50 to-cyan-100",
+                sintomas: [
+                    "Dolor o ardor intenso al orinar.",
+                    "Orina con mal olor o color extraño.",
+                    "Dolor severo en la parte baja de la espalda o abdomen.",
+                    "Sangre visible en la orina (hematuria)."
+                ]
+            },
+            {
+                categoria: "Emergencia Psiquiátrica / Mental",
+                icono: "brain",
+                color: "text-teal-600",
+                bg: "from-teal-50 to-teal-100",
+                sintomas: [
+                     "Ideas suicidas o de autolesión.",
+                     "Cambios drásticos en el estado de ánimo.",
+                     "Aislamiento extremo o desinterés por actividades diarias.",
+                     "Perdida de interés en su aspecto personal."
+                ]
+            },
+             {
+                categoria: "Emergencia Traumática (Golpes)",
+                icono: "bone",
+                color: "text-stone-600",
+                bg: "from-slate-50 to-slate-200",
+                sintomas: [
+                    "Fracturas expuestas o deformidad evidente.",
+                    "Golpes fuertes en la cabeza con pérdida de conciencia.",
+                    "Hemorragias que no ceden con presión directa.",
+                    "Incapacidad para mover una extremidad."
+                ]
+            },
+            {
+                categoria: "Emergencia por Quemaduras",
+                icono: "flame",
+                color: "text-orange-500",
+                bg: "from-amber-50 to-orange-100",
+                sintomas: [
+                    "Quemaduras extensas o profundas.",
+                    "Quemaduras en cara, manos, pies o genitales.",
+                    "Quemaduras químicas o eléctricas.",
+                    "Inhalación de humo o gases calientes."
+                ]
+            },
+             {
+                categoria: "Intoxicación / Envenenamiento",
+                icono: "pill",
+                color: "text-lime-600",
+                bg: "from-lime-50 to-lime-100",
+                sintomas: [
+                    "Ingesta accidental o intencional de venenos o fármacos.",
+                    "Vómitos, diarrea o dolor abdominal súbito.",
+                    "Dificultad para respirar o pérdida de conciencia.",
+                    "Convulsiones o confusión mental."
+                ]
+            },
+            {
+                categoria: "Emergencia Infecciosa Grave",
+                icono: "shield",
+                color: "text-emerald-600",
+                bg: "from-emerald-50 to-emerald-100",
+                sintomas: [
+                    "Fiebre alta (>39°C) con rigidez de nuca.",
+                    "Heridas con pus, enrojecimiento y calor.",
+                    "Dificultad para respirar o taquicardia.",
+                    "Confusión mental o somnolencia extrema."
+                ]
+            },
+            {
+                categoria: "Emergencia Pediátrica",
+                icono: "baby",
+                color: "text-pink-600",
+                bg: "from-pink-50 to-pink-100",
+                sintomas: [
+                    "Fiebre alta en menores de 3 meses.",
+                    "Convulsiones o movimientos anormales.",
+                    "Dificultad para respirar (tiraje costal).",
+                    "Rechazo al alimento o vómitos persistentes."
+                ]
+            },
+            {
+                categoria: "Emergencia Obstétrica",
+                icono: "baby",
+                color: "text-rose-600",
+                bg: "from-rose-50 to-rose-100",
+                sintomas: [
+                    "Sangrado vaginal abundante.",
+                    "Dolor abdominal intenso y persistente.",
+                    "Pérdida de líquido por la vagina.",
+                    "Ausencia de movimientos fetales."
+                ]
+            },
+            {
+                categoria: "Emergencia Alérgica (Anafilaxia)",
+                icono: "alert",
+                color: "text-violet-600",
+                bg: "from-violet-50 to-violet-100",
+                sintomas: [
+                    "Hinchazón de labios, lengua o garganta.",
+                    "Dificultad para respirar o tragar.",
+                    "Ronchas o picazón intensa en todo el cuerpo.",
+                    "Mareos o desmayos."
+                ]
+            },
+            {
+                categoria: "Emergencia Metabólica",
+                icono: "droplets",
+                color: "text-indigo-600",
+                bg: "from-indigo-50 to-indigo-100",
+                sintomas: [
+                    "Aliento con olor a frutas (cetoacidosis).",
+                    "Sed extrema y orina frecuente.",
+                    "Deshidratación severa (boca seca, piel arrugada).",
+                    "Confusión o pérdida de conciencia."
+                ]
+            },
+            {
+                categoria: "Emergencia Ambiental",
+                icono: "sun",
+                color: "text-yellow-600",
+                bg: "from-yellow-50 to-yellow-100",
+                sintomas: [
+                    "Golpe de calor (piel roja, caliente y seca).",
+                    "Mordeduras de serpientes o animales salvajes.",
+                    "Picaduras de insectos con reacción alérgica.",
+                    "Hipotermia (temblores, piel fría y pálida)."
+                ]
+            },
+            {
+                categoria: "Emergencias Dentales",
+                icono: "sun",
+                color: "text-cyan-600",
+                bg: "from-sky-50 to-sky-100",
+                sintomas: [
+                    "Dolor de muelas intenso y pulsátil.",
+                    "Absceso dental (hinchazón en la cara o encía).",
+                    "Diente roto o fracturado por golpe.",
+                    "Sangrado abundante tras una extracción."
+                ]
+            },
+            {
+                categoria: "Otros Signos de Alerta",
+                icono: "thermometer",
+                color: "text-amber-600",
+                bg: "from-amber-50 to-amber-100",
+                sintomas: [
+                    "Fiebre alta y persistente.",
+                    "Sangrado incontrolable.",
+                    "Cambios en el color de la piel.",
+                    "Pérdida de peso inexplicable."
+                ]
+            }
+        ];
+
+        const PRIMEROS_AUXILIOS = [
+            { id: 1, nombre: "Reanimación Cardiopulmonar (RCP)", pasos: ["Asegúrese de que el área sea segura.", "Verifique si la persona responde y respira con normalidad.", "Llame a emergencias inmediatamente (o pida a alguien que lo haga).", "Coloque el talón de una mano en el centro del pecho y la otra encima entrelazando los dedos.", "Presione fuerte y rápido (100-120 compresiones por minuto) a 5cm de profundidad.", "No se detenga hasta que llegue la ayuda o la persona respire."], icono: "heart", gradient: "from-red-500 to-rose-600", shadow: "shadow-glow-red", youtubeId: "8E_tHsTNK6g" },
+            { id: 2, nombre: "Atragantamiento (Heimlich)", pasos: ["Pregunte: '¿Te estás ahogando?'. Si no puede toser ni hablar, actúe de inmediato.", "Párese detrás de la persona y abrácela por la cintura.", "Cierre un puño y coloque el lado del pulgar justo por encima del ombligo de la víctima.", "Agarre su puño con la otra mano.", "Haga compresiones rápidas y secas hacia adentro y hacia arriba.", "Repita hasta que el objeto salga o la persona pierda el conocimiento."], icono: "activity", gradient: "from-orange-400 to-amber-600", shadow: "shadow-glow-amber", youtubeId: "HDsBQJhIRZc" },
+            { id: 3, nombre: "Hemorragias Severas", pasos: ["Colóquese guantes de látex si están disponibles.", "Aplique presión directa y firme sobre la herida con una gasa o tela limpia.", "Si la tela se empapa de sangre, NO la quite; coloque otra encima y siga presionando.", "Eleve la extremidad herida por encima del nivel del corazón si es posible y no hay fractura.", "Si el sangrado no se detiene, mantenga la presión y busque ayuda médica urgente."], icono: "droplets", gradient: "from-red-600 to-red-800", shadow: "shadow-glow-red", youtubeId: "IfSZl6izsFk" },
+            { id: 4, nombre: "Quemaduras", pasos: ["Aleje a la víctima de la fuente de la quemadura.", "Enfríe la zona afectada con agua corriente a temperatura ambiente durante 10 a 20 minutos.", "NO use hielo, cremas, aceites, mantequilla, ni pasta dental.", "NO rompa las ampollas si se forman.", "Cubra suavemente la zona con una gasa estéril o un paño limpio y húmedo.", "Acuda a un centro médico si la quemadura es extensa, profunda, o en la cara/genitales."], icono: "flame", gradient: "from-orange-500 to-red-500", shadow: "shadow-glow-orange", youtubeId: "4Nf7KsfT8jo" },
+            { id: 5, nombre: "Convulsiones", pasos: ["Mantenga la calma, la mayoría dura pocos minutos.", "Despeje el área de muebles u objetos peligrosos.", "Coloque algo suave y plano bajo la cabeza de la persona.", "Afloje la ropa alrededor del cuello.", "NO intente sujetar a la persona para detener sus movimientos.", "NO meta nada en su boca (no se tragarán la lengua).", "Al terminar, gírela suavemente hacia un lado (posición de seguridad) para mantener la vía aérea despejada."], icono: "zap", gradient: "from-purple-500 to-indigo-600", shadow: "shadow-glow-purple", youtubeId: "n9lcFQw6g2o" },
+            { id: 6, nombre: "Desmayos (Síncope)", pasos: ["Si ve que alguien se va a desmayar, ayúdelo a sentarse o recostarse.", "Si ya se desmayó, recuéstelo boca arriba.", "Eleve sus piernas unos 30 cm por encima del nivel del corazón para mejorar el flujo sanguíneo al cerebro.", "Afloje cinturones, corbatas o ropa ajustada.", "Asegure buena ventilación en el área (evite aglomeraciones de personas).", "Si no recupera la conciencia en 1 minuto, llame a emergencias."], icono: "moon", gradient: "from-blue-400 to-cyan-500", shadow: "shadow-glow-blue", youtubeId: "cLA-g8mWal4" },
+            { id: 7, nombre: "Fracturas y Esguinces", pasos: ["No intente mover a la persona si sospecha lesión en cuello o columna.", "Inmovilice la zona afectada en la posición en la que se encuentra.", "Aplique compresas de hielo envueltas en tela por 20 min.", "Eleve la extremidad si es posible para reducir la inflamación.", "Busque atención médica urgente."], icono: "bone", gradient: "from-slate-400 to-slate-600", shadow: "shadow-3d", youtubeId: "Hhg2HKiAN-o" },
+            { id: 8, nombre: "Intoxicaciones", pasos: ["Averigüe qué sustancia ingirió la persona, cuánto y hace qué tiempo.", "No provoque el vómito a menos que un profesional de la salud se lo indique.", "Si la sustancia es un gas, lleve a la persona al aire libre inmediatamente.", "Llame al centro de toxicología o emergencias llevando el envase del producto."], icono: "pill", gradient: "from-emerald-400 to-green-600", shadow: "shadow-glow-emerald", youtubeId: "ZkG2kZnHYM0" },
+            { id: 9, nombre: "Golpes en la Cabeza", pasos: ["Aplique hielo envuelto en un paño en el área del golpe.", "Mantenga a la persona despierta y observe si hay confusión, vómitos repetidos o pupilas desiguales.", "Si hay sangrado, aplique presión suave con una gasa limpia.", "Acuda a urgencias si pierde el conocimiento aunque sea por un segundo."], icono: "brain", gradient: "from-indigo-400 to-blue-600", shadow: "shadow-glow-blue", youtubeId: "HSmemJFKlGI" },
+            { id: 10, nombre: "Picaduras y Mordeduras", pasos: ["Si el aguijón está presente (ej. abeja), retírelo raspando suavemente con una tarjeta, no usando pinzas.", "Lave el área con agua y jabón.", "Aplique hielo envuelto en tela para bajar la hinchazón.", "Si hay alergia severa (anafilaxia), use autoinyector de epinefrina si tiene y llame al 123."], icono: "alert", gradient: "from-yellow-400 to-amber-600", shadow: "shadow-glow-amber", youtubeId: "FayIJJMyuE8" },
+            { id: 11, nombre: "Golpe de Calor", pasos: ["Lleve a la persona a un lugar fresco y con sombra.", "Afloje o quite la ropa excesiva.", "Aplique paños fríos o hielo en axilas, cuello, ingle y espalda.", "Ofrezca sorbos de agua fresca si está totalmente consciente.", "Llame a emergencias si hay confusión o piel caliente seca."], icono: "sun", gradient: "from-red-400 to-orange-500", shadow: "shadow-glow-red", youtubeId: "HKg0BS3QCZI" },
+            { id: 12, nombre: "Hipotermia", pasos: ["Lleve a la persona a un lugar cálido y seco.", "Retire ropa mojada y reemplácela por mantas secas o abrigos.", "Caliente el centro del cuerpo (pecho, cuello, ingle) primero.", "Ofrezca bebidas dulces calientes (sin alcohol ni cafeína).", "No frote las extremidades para calentarlas."], icono: "thermometer", gradient: "from-cyan-300 to-blue-500", shadow: "shadow-glow-blue", youtubeId: "cLA-g8mWal4" }
+        ];
+
+        const App = () => {
+            const [view, setView] = useState('home'); 
+            const [searchQuery, setSearchQuery] = useState('');
+            const [selectedCategory, setSelectedCategory] = useState('Todas');
+            const [selectedDisease, setSelectedDisease] = useState(null);
+            const [selectedHabit, setSelectedHabit] = useState(null);
+            const [selectedFirstAid, setSelectedFirstAid] = useState(null);
+            
+            const categoryScrollRef = useRef(null);
+
+            const categorias = ['Todas', 'Infecciosa', 'Metabólica', 'Cardiovascular', 'Respiratoria', 'Digestiva', 'Mental', 'Neurológica', 'Dermatológica', 'Ósea', 'Articular', 'Auditiva', 'Bucal', 'Ocular', 'Urinaria', 'Oncológica', 'Nutricional'];
+
+            const filteredDiseases = useMemo(() => {
+                return ENFERMEDADES.filter(d => {
+                    const matchesSearch = d.nombre.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                         d.deteccion.toLowerCase().includes(searchQuery.toLowerCase());
+                    const matchesCategory = selectedCategory === 'Todas' || d.categoria === selectedCategory;
+                    return matchesSearch && matchesCategory;
+                });
+            }, [searchQuery, selectedCategory]);
+
+            const scrollCategories = (direction) => {
+                if (categoryScrollRef.current) {
+                    const scrollAmount = 200;
+                    categoryScrollRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+                }
+            };
+
+            return (
+                <div className="min-h-screen pb-28 max-w-5xl mx-auto transition-all duration-500 bg-transparent">
+                    {/* Header 3D Glass */}
+                    <header className="relative mt-4 z-40 mx-4 px-6 py-4 rounded-3xl glass-card flex justify-between items-center shadow-3d animate-pop mb-8">
+                        <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setView('home')}>
+                            <Icon3D name="heart" gradient="from-blue-500 to-indigo-600" shadow="shadow-glow-blue" size={20} />
+                            <h1 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-purple-700 tracking-tight drop-shadow-sm">Salud <span className="text-blue-500">UCN</span></h1>
+                        </div>
+                        <div className="hidden sm:block text-[10px] font-black text-white bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 rounded-full shadow-glow-purple uppercase tracking-widest animate-pulse">
+                            Pastoral y Bienestar
+                        </div>
+                    </header>
+
+                    <main className="px-4 sm:px-8">
+                        {}
+                        {view === 'home' && (
+                            <div className="space-y-10 animate-fade">
+                                {/* Banner 3D Hero Vivo */}
+                                <div 
+                                    className="rounded-[3rem] p-10 sm:p-16 text-white relative overflow-hidden shadow-glow-blue border border-white/20 group"
+                                    style={{
+                                        backgroundImage: 'linear-gradient(to right, rgba(30, 58, 138, 0.85), rgba(88, 28, 135, 0.85)), url("https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=1200&q=80")',
+                                        backgroundSize: 'cover',
+                                        backgroundPosition: 'center'
+                                    }}
+                                >
+                                    <div className="relative z-10 max-w-2xl">
+                                        <h2 className="text-5xl sm:text-6xl font-black mb-4 tracking-tighter drop-shadow-lg leading-tight">
+                                            Tu Bienestar <br/><span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Universitario</span>
+                                        </h2>
+                                        <p className="text-indigo-200 mb-10 text-lg font-semibold leading-relaxed">Explora 150 condiciones médicas, signos de alarma vitales y recomendaciones personalizadas.</p>
+                                        <div className="relative max-w-md group-hover:scale-105 transition-transform duration-500">
+                                            <div className="absolute left-5 top-5"><SVGIcon name="search" color="#a5b4fc" size={24} /></div>
+                                            <input 
+                                                type="text" placeholder="Buscar síntomas..."
+                                                className="w-full bg-white/10 border-2 border-white/20 rounded-3xl py-5 pl-14 pr-6 text-base focus:outline-none focus:border-cyan-400 placeholder:text-indigo-300 transition-all text-white backdrop-blur-xl shadow-3d-pressed"
+                                                onFocus={() => setView('diseases')}
+                                            />
+                                        </div>
+                                    </div>
+                                    {/* Esferas Flotantes 3D Vivas */}
+                                    <div className="absolute -top-10 -right-10 w-64 h-64 bg-gradient-to-br from-cyan-400 to-blue-600 rounded-full blur-2xl opacity-60 animate-float"></div>
+                                    <div className="absolute bottom-[-20%] right-[20%] w-48 h-48 bg-gradient-to-br from-fuchsia-500 to-pink-500 rounded-full blur-3xl opacity-50 animate-float" style={{ animationDelay: '2s' }}></div>
+                                </div>
+
+                                {/* Botones de Acción 3D */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <div onClick={() => setView('diseases')} className="group relative bg-white/60 backdrop-blur-lg p-8 rounded-[2.5rem] border border-white shadow-3d cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-glow-blue">
+                                        <div className="absolute top-0 right-0 p-8 opacity-5 transform group-hover:scale-150 group-hover:rotate-12 transition-transform duration-700">
+                                            <SVGIcon name="book" size={120} />
+                                        </div>
+                                        <Icon3D name="stethoscope" gradient="from-cyan-400 to-blue-500" shadow="shadow-glow-blue" />
+                                        <h3 className="font-black text-slate-800 text-xl mt-6 mb-2">Directorio Médico</h3>
+                                        <p className="text-slate-600 font-medium text-sm">150 fichas clínicas detalladas.</p>
+                                    </div>
+
+                                    <div onClick={() => setView('recommendations')} className="group relative bg-white/60 backdrop-blur-lg p-8 rounded-[2.5rem] border border-white shadow-3d cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-glow-purple">
+                                        <div className="absolute top-0 right-0 p-8 opacity-5 transform group-hover:scale-150 group-hover:-rotate-12 transition-transform duration-700">
+                                            <SVGIcon name="user" size={120} />
+                                        </div>
+                                        <Icon3D name="user" gradient="from-purple-400 to-pink-500" shadow="shadow-glow-purple" />
+                                        <h3 className="font-black text-slate-800 text-xl mt-6 mb-2">Recomendaciones</h3>
+                                        <p className="text-slate-600 font-medium text-sm">Prevención y bienestar integral.</p>
+                                    </div>
+
+                                    <div onClick={() => setView('alarms')} className="group relative bg-white/60 backdrop-blur-lg p-8 rounded-[2.5rem] border border-white shadow-3d cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-glow-red">
+                                        <div className="absolute top-0 right-0 p-8 opacity-5 transform group-hover:scale-150 transition-transform duration-700 text-red-500">
+                                            <SVGIcon name="siren" size={120} color="currentColor" />
+                                        </div>
+                                        <Icon3D name="siren" gradient="from-red-500 to-rose-600" shadow="shadow-glow-red" />
+                                        <h3 className="font-black text-slate-800 text-xl mt-6 mb-2">Signos de Alarma</h3>
+                                        <p className="text-slate-600 font-medium text-sm">Identifica emergencias rápido.</p>
+                                        <div className="absolute top-4 right-4 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+                                    </div>
+
+                                    <div onClick={() => setView('firstaid')} className="group relative bg-white/60 backdrop-blur-lg p-8 rounded-[2.5rem] border border-white shadow-3d cursor-pointer overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-glow-emerald">
+                                        <div className="absolute top-0 right-0 p-8 opacity-5 transform group-hover:scale-150 group-hover:rotate-12 transition-transform duration-700 text-emerald-500">
+                                            <SVGIcon name="aidKit" size={120} color="currentColor" />
+                                        </div>
+                                        <Icon3D name="aidKit" gradient="from-emerald-400 to-teal-500" shadow="shadow-glow-emerald" />
+                                        <h3 className="font-black text-slate-800 text-xl mt-6 mb-2">Primeros Auxilios</h3>
+                                        <p className="text-slate-600 font-medium text-sm">Guía de acción para emergencias.</p>
+                                    </div>
+                                </div>
+
+                                {/* Pilares de Salud 3D */}
+                                <div className="animate-fade mt-10" style={{ animationDelay: '0.2s' }}>
+                                    <div className="flex justify-between items-end mb-6">
+                                        <div>
+                                            <h3 className="font-black text-slate-800 text-2xl tracking-tight drop-shadow-sm">Pilares de Salud</h3>
+                                            <p className="text-slate-500 text-sm font-bold">Hábitos recomendados por especialistas de la UCN.</p>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                                        {HABITOS.map(h => (
+                                            <div key={h.id} onClick={() => setSelectedHabit(h)} className="group bg-white/60 backdrop-blur-lg p-5 rounded-[2rem] border border-white shadow-3d cursor-pointer hover:-translate-y-2 transition-all duration-300 flex items-center gap-4 hover:shadow-3d-pressed">
+                                                <Icon3D name={h.icono} gradient={h.gradient} shadow={h.shadow} size={20} />
+                                                <div>
+                                                    <h4 className="font-black text-slate-800 text-sm uppercase tracking-tight">{h.titulo}</h4>
+                                                    <p className="text-[10px] text-slate-500 font-bold line-clamp-1 leading-tight">{h.desc}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {}
+                        {view === 'diseases' && (
+                            <div className="max-w-5xl mx-auto space-y-8 animate-pop pb-10">
+                                <div className="flex justify-between items-center bg-white/60 backdrop-blur-md p-6 rounded-[2rem] border border-white shadow-sm">
+                                    <div>
+                                        <h2 className="text-3xl font-black text-blue-600 tracking-tight">Directorio Médico</h2>
+                                        <p className="text-slate-500 font-bold text-sm">Mostrando {filteredDiseases.length} condiciones registradas.</p>
+                                    </div>
+                                    <button onClick={() => setView('home')} className="bg-white shadow-3d text-slate-700 px-6 py-3 rounded-2xl font-black hover:bg-slate-50 active:scale-95 flex items-center gap-2">
+                                        <SVGIcon name="chevronLeft" size={20} /> Volver
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                    <div className="lg:col-span-1 space-y-6">
+                                        <div className="relative group">
+                                            <div className="absolute left-5 top-5"><SVGIcon name="search" color="#94a3b8" size={20} /></div>
+                                            <input 
+                                                type="text" placeholder="Filtrar síntoma o enfermedad..."
+                                                className="w-full bg-white/80 backdrop-blur-xl border border-white rounded-[2rem] py-5 pl-14 pr-6 text-sm focus:outline-none focus:border-blue-400 shadow-3d-pressed transition-all text-slate-700"
+                                                value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div className="bg-white/60 backdrop-blur-xl p-6 rounded-[2rem] border border-white shadow-3d">
+                                            <div className="flex items-center gap-3 mb-4 px-2">
+                                                <SVGIcon name="activity" size={20} color="#3b82f6" />
+                                                <h4 className="font-black text-slate-800 text-sm uppercase tracking-widest text-[10px]">Categorías</h4>
+                                            </div>
+                                            <div className="flex flex-wrap lg:flex-col gap-2 max-h-60 lg:max-h-full overflow-y-auto no-scrollbar">
+                                                {categorias.map(cat => (
+                                                    <button 
+                                                        key={cat} 
+                                                        onClick={() => setSelectedCategory(cat)} 
+                                                        className={`px-5 py-3 rounded-2xl text-xs font-black uppercase transition-all text-left flex justify-between items-center ${selectedCategory === cat ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-glow-blue' : 'bg-white/50 text-slate-500 hover:bg-white shadow-sm border border-transparent hover:border-slate-200'}`}
+                                                    >
+                                                        {cat}
+                                                        {selectedCategory === cat && <SVGIcon name="chevronRight" size={16} />}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-5 h-full pb-10">
+                                        {filteredDiseases.length > 0 ? filteredDiseases.map(d => (
+                                            <div key={d.id} onClick={() => setSelectedDisease(d)} className="bg-white/80 backdrop-blur-xl p-5 rounded-[2rem] border border-white shadow-sm hover:-translate-y-1 hover:shadow-3d transition-all flex items-center justify-between group cursor-pointer">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={`p-3 rounded-[1.2rem] flex items-center justify-center text-white shadow-inner ${d.severidad === 'Crítica' ? 'bg-slate-900' : d.severidad === 'Alta' ? 'bg-red-500' : d.severidad === 'Crónica' ? 'bg-purple-500' : 'bg-blue-500'}`}>
+                                                        <SVGIcon name={d.categoria === 'Mental' ? 'brain' : d.categoria === 'Infecciosa' ? 'thermometer' : 'heart'} size={20} color="white" />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-black text-sm text-slate-800 line-clamp-1">{d.nombre}</h3>
+                                                        <p className="text-[10px] uppercase font-black text-slate-400 tracking-tighter mt-0.5">{d.categoria} • <span className={d.severidad === 'Crítica' || d.severidad === 'Alta' ? 'text-red-500' : ''}>{d.severidad}</span></p>
+                                                    </div>
+                                                </div>
+                                                <SVGIcon name="chevronRight" size={20} className="text-slate-300 group-hover:text-blue-500 transition-all shrink-0" />
+                                            </div>
+                                        )) : (
+                                            <div className="col-span-full bg-white/60 p-10 rounded-[2rem] border border-white shadow-inner text-center">
+                                                <p className="text-slate-500 font-bold">No se encontraron resultados para tu búsqueda.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {}
+                        {view === 'recommendations' && (
+                            <div className="max-w-5xl mx-auto space-y-8 animate-pop pb-10">
+                                <div className="flex justify-between items-center bg-white/60 backdrop-blur-md p-6 rounded-[2rem] border border-white shadow-sm">
+                                    <div>
+                                        <h2 className="text-3xl font-black text-purple-600 tracking-tight">Recomendaciones</h2>
+                                        <p className="text-slate-500 font-bold text-sm">Guía preventiva para el cuidado integral.</p>
+                                    </div>
+                                    <button onClick={() => setView('home')} className="bg-white shadow-3d text-slate-700 px-6 py-3 rounded-2xl font-black hover:bg-slate-50 active:scale-95 flex items-center gap-2">
+                                        <SVGIcon name="chevronLeft" size={20} /> Volver
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="bg-gradient-to-br from-pink-50 to-rose-100 p-8 rounded-[2.5rem] border border-white shadow-3d hover:shadow-glow-rose transition-shadow">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="p-3 rounded-2xl bg-white shadow-sm text-pink-600"><SVGIcon name="user" size={24} /></div>
+                                            <h3 className="font-black text-slate-800 text-xl">Salud Femenina</h3>
+                                        </div>
+                                        <ul className="space-y-4">
+                                            {RECOMENDACIONES.mujeres.map((rec, i) => (
+                                                <li key={i} className="flex items-start gap-3 text-sm text-slate-700 font-bold leading-relaxed">
+                                                    <div className="mt-1.5 w-2 h-2 rounded-full bg-pink-500 shrink-0 shadow-sm"></div>
+                                                    {rec}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                    
+                                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-[2.5rem] border border-white shadow-3d hover:shadow-glow-blue transition-shadow">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="p-3 rounded-2xl bg-white shadow-sm text-blue-600"><SVGIcon name="user" size={24} /></div>
+                                            <h3 className="font-black text-slate-800 text-xl">Salud Masculina</h3>
+                                        </div>
+                                        <ul className="space-y-4">
+                                            {RECOMENDACIONES.hombres.map((rec, i) => (
+                                                <li key={i} className="flex items-start gap-3 text-sm text-slate-700 font-bold leading-relaxed">
+                                                    <div className="mt-1.5 w-2 h-2 rounded-full bg-blue-500 shrink-0 shadow-sm"></div>
+                                                    {rec}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="bg-gradient-to-br from-teal-50 to-emerald-100 p-8 rounded-[2.5rem] border border-white shadow-3d hover:shadow-glow-emerald transition-shadow">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="p-3 rounded-2xl bg-white shadow-sm text-teal-600"><SVGIcon name="brain" size={24} /></div>
+                                            <h3 className="font-black text-slate-800 text-xl">Salud Mental y Sueño</h3>
+                                        </div>
+                                        <ul className="space-y-4">
+                                            {RECOMENDACIONES.mental.map((rec, i) => (
+                                                <li key={i} className="flex items-start gap-3 text-sm text-slate-700 font-bold leading-relaxed">
+                                                    <div className="mt-1.5 w-2 h-2 rounded-full bg-teal-500 shrink-0 shadow-sm"></div>
+                                                    {rec}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 p-8 rounded-[2.5rem] border border-white shadow-3d hover:shadow-glow-amber transition-shadow">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="p-3 rounded-2xl bg-white shadow-sm text-orange-600"><SVGIcon name="apple" size={24} /></div>
+                                            <h3 className="font-black text-slate-800 text-xl">Nutrición y Hábitos</h3>
+                                        </div>
+                                        <ul className="space-y-4">
+                                            {RECOMENDACIONES.nutricional.map((rec, i) => (
+                                                <li key={i} className="flex items-start gap-3 text-sm text-slate-700 font-bold leading-relaxed">
+                                                    <div className="mt-1.5 w-2 h-2 rounded-full bg-orange-500 shrink-0 shadow-sm"></div>
+                                                    {rec}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="bg-gradient-to-br from-indigo-50 to-violet-100 p-8 rounded-[2.5rem] border border-white shadow-3d hover:shadow-glow-purple transition-shadow">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="p-3 rounded-2xl bg-white shadow-sm text-indigo-600"><SVGIcon name="chair" size={24} /></div>
+                                            <h3 className="font-black text-slate-800 text-xl">Ergonomía y Estudio</h3>
+                                        </div>
+                                        <ul className="space-y-4">
+                                            {RECOMENDACIONES.estudio.map((rec, i) => (
+                                                <li key={i} className="flex items-start gap-3 text-sm text-slate-700 font-bold leading-relaxed">
+                                                    <div className="mt-1.5 w-2 h-2 rounded-full bg-indigo-500 shrink-0 shadow-sm"></div>
+                                                    {rec}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="bg-gradient-to-br from-cyan-50 to-sky-100 p-8 rounded-[2.5rem] border border-white shadow-3d hover:shadow-glow-blue transition-shadow">
+                                        <div className="flex items-center gap-4 mb-6">
+                                            <div className="p-3 rounded-2xl bg-white shadow-sm text-cyan-600"><SVGIcon name="dumbbell" size={24} /></div>
+                                            <h3 className="font-black text-slate-800 text-xl">Actividad Física</h3>
+                                        </div>
+                                        <ul className="space-y-4">
+                                            {RECOMENDACIONES.fisica.map((rec, i) => (
+                                                <li key={i} className="flex items-start gap-3 text-sm text-slate-700 font-bold leading-relaxed">
+                                                    <div className="mt-1.5 w-2 h-2 rounded-full bg-cyan-500 shrink-0 shadow-sm"></div>
+                                                    {rec}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white/80 backdrop-blur-xl p-8 rounded-[2.5rem] border border-white shadow-3d">
+                                    <div className="flex items-center gap-4 mb-6">
+                                        <div className="p-3 rounded-2xl bg-emerald-100 text-emerald-600 shadow-inner"><SVGIcon name="plane" size={24} /></div>
+                                        <h3 className="font-black text-slate-800 text-xl">Recomendaciones Generales y Viajes</h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {RECOMENDACIONES.general.map((rec, i) => (
+                                            <div key={i} className="flex items-start gap-3 text-sm text-slate-700 font-bold bg-white p-4 rounded-2xl shadow-sm border border-slate-50">
+                                                <div className="mt-1 w-2 h-2 rounded-full bg-emerald-500 shrink-0"></div>
+                                                {rec}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {}
+                        {view === 'alarms' && (
+                            <div className="max-w-5xl mx-auto space-y-8 animate-pop pb-10">
+                                <div className="flex justify-between items-center bg-white/60 backdrop-blur-md p-6 rounded-[2rem] border border-white shadow-sm">
+                                    <div>
+                                        <h2 className="text-3xl font-black text-red-600 tracking-tight">Signos de Alarma</h2>
+                                        <p className="text-slate-500 font-bold text-sm">Atención médica inmediata requerida.</p>
+                                    </div>
+                                    <button onClick={() => setView('home')} className="bg-white shadow-3d text-slate-700 px-6 py-3 rounded-2xl font-black hover:bg-slate-50 active:scale-95 flex items-center gap-2">
+                                        <SVGIcon name="chevronLeft" size={20} /> Volver
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {SIGNOS_ALARMA.map((cat, idx) => (
+                                        <div key={idx} className={`p-8 rounded-[2.5rem] border border-white shadow-3d bg-gradient-to-br ${cat.bg} transition-all hover:-translate-y-1`}>
+                                            <div className="flex items-center gap-4 mb-6">
+                                                <div className={`p-3 rounded-2xl bg-white shadow-sm ${cat.color}`}>
+                                                    <SVGIcon name={cat.icono} size={28} />
+                                                </div>
+                                                <h3 className="font-black text-slate-800 text-lg leading-tight">{cat.categoria}</h3>
+                                            </div>
+                                            <ul className="space-y-4">
+                                                {cat.sintomas.map((sintoma, sIdx) => (
+                                                    <li key={sIdx} className="flex items-start gap-3">
+                                                        <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${cat.color.replace('text-', 'bg-')}`}></div>
+                                                        <p className="text-slate-700 text-sm font-bold leading-relaxed">{sintoma}</p>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="bg-gradient-to-r from-red-600 to-rose-600 p-10 rounded-[3rem] text-white shadow-glow-red flex flex-col md:flex-row items-center gap-8 border border-red-400 relative overflow-hidden">
+                                    <div className="absolute right-0 top-0 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                                    <div className="bg-white/20 p-6 rounded-full animate-pulse shrink-0 backdrop-blur-sm relative z-10">
+                                        <SVGIcon name="siren" size={64} color="white" />
+                                    </div>
+                                    <div className="space-y-3 relative z-10">
+                                        <h3 className="text-3xl font-black uppercase tracking-tight drop-shadow-md">Acción Inmediata</h3>
+                                        <p className="text-red-50 font-bold text-lg leading-relaxed">No esperes a que los síntomas pasen. En emergencias, cada minuto cuenta para preservar la vida.</p>
+                                        <div className="inline-block bg-white text-red-600 px-6 py-2 rounded-full font-black text-sm uppercase tracking-widest mt-2 shadow-lg">Llamar a Emergencias (123)</div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {}
+                        {view === 'firstaid' && (
+                            <div className="max-w-5xl mx-auto space-y-8 animate-pop">
+                                <div className="flex justify-between items-center bg-white/60 backdrop-blur-md p-6 rounded-[2rem] border border-white shadow-sm">
+                                    <div>
+                                        <h2 className="text-3xl font-black text-emerald-600 tracking-tight">Primeros Auxilios Básicos</h2>
+                                        <p className="text-slate-500 font-bold text-sm">Guía rápida de acción ante emergencias vitales.</p>
+                                    </div>
+                                    <button onClick={() => setView('home')} className="bg-white shadow-3d text-slate-700 px-6 py-3 rounded-2xl font-black hover:bg-slate-50 active:scale-95 flex items-center gap-2">
+                                        <SVGIcon name="chevronLeft" size={20} /> Volver
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {PRIMEROS_AUXILIOS.map(item => (
+                                        <div key={item.id} onClick={() => setSelectedFirstAid(item)} className="bg-white/80 backdrop-blur-xl p-8 rounded-[2rem] border border-white shadow-3d hover:-translate-y-2 transition-transform duration-300 cursor-pointer group hover:shadow-glow-emerald">
+                                            <div className="flex flex-col items-center text-center gap-5">
+                                                <Icon3D name={item.icono} gradient={item.gradient} shadow={item.shadow} size={32} />
+                                                <h3 className="font-black text-slate-800 text-xl leading-tight group-hover:text-emerald-600 transition-colors">{item.nombre}</h3>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-10 rounded-[3rem] text-white shadow-glow-emerald flex flex-col md:flex-row items-center gap-8 border border-emerald-400 mt-8">
+                                    <div className="bg-white/20 p-6 rounded-full shrink-0 backdrop-blur-sm">
+                                        <SVGIcon name="shield" size={64} color="white" />
+                                    </div>
+                                    <div className="space-y-3">
+                                        <h3 className="text-3xl font-black uppercase tracking-tight drop-shadow-md">Proteger, Avisar, Socorrer</h3>
+                                        <p className="text-emerald-50 font-bold text-lg leading-relaxed">Antes de actuar, asegúrese de que el entorno sea seguro para usted. El primer paso crucial en cualquier emergencia es contactar a los profesionales de la salud o ambulancias.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    {/* Navegación Inferior Flotante 3D */}
+                    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[95%] max-w-2xl glass-card rounded-[2rem] p-2 flex justify-around shadow-3d z-40">
+                        <button onClick={() => setView('home')} className={`p-4 rounded-[1.5rem] transition-all flex items-center justify-center ${view === 'home' ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-glow-blue' : 'text-slate-500 hover:bg-slate-100'}`}><SVGIcon name="home" size={24} /></button>
+                        <button onClick={() => setView('diseases')} className={`p-4 rounded-[1.5rem] transition-all flex items-center justify-center ${view === 'diseases' ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-glow-blue' : 'text-slate-500 hover:bg-slate-100'}`}><SVGIcon name="book" size={24} /></button>
+                        <button onClick={() => setView('recommendations')} className={`p-4 rounded-[1.5rem] transition-all flex items-center justify-center ${view === 'recommendations' ? 'bg-gradient-to-r from-purple-400 to-pink-500 text-white shadow-glow-purple' : 'text-slate-500 hover:bg-purple-50 hover:text-purple-500'}`}><SVGIcon name="user" size={24} /></button>
+                        <button onClick={() => setView('alarms')} className={`p-4 rounded-[1.5rem] transition-all flex items-center justify-center ${view === 'alarms' ? 'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-glow-red' : 'text-slate-500 hover:bg-red-50 hover:text-red-500'}`}><SVGIcon name="siren" size={24} /></button>
+                        <button onClick={() => setView('firstaid')} className={`p-4 rounded-[1.5rem] transition-all flex items-center justify-center ${view === 'firstaid' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-glow-emerald' : 'text-slate-500 hover:bg-emerald-50 hover:text-emerald-600'}`}><SVGIcon name="aidKit" size={24} /></button>
+                    </nav>
+
+                    {/* MODAL INTERACTIVO RESTAURADO Y ACTUALIZADO */}
+                    {(selectedDisease || selectedHabit || selectedFirstAid) && (
+                        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/60 backdrop-blur-md animate-fade">
+                            <div className="bg-white/90 backdrop-blur-xl w-full max-w-2xl rounded-t-[3rem] sm:rounded-[2.5rem] p-8 sm:p-10 max-h-[92vh] overflow-y-auto no-scrollbar shadow-3d border border-white">
+                                <div className="w-12 h-1.5 bg-slate-300 rounded-full mx-auto mb-6 sm:hidden"></div>
+                                
+                                <div className="flex justify-between items-start mb-8">
+                                    <div className="flex-1 pr-6">
+                                        <span className="text-[10px] font-black text-blue-600 bg-blue-100 px-4 py-1.5 rounded-full uppercase tracking-widest shadow-sm">
+                                            {selectedDisease ? 'Ficha Médica' : selectedFirstAid ? 'Emergencias' : 'Hábito Saludable'}
+                                        </span>
+                                        <h2 className="text-3xl font-black mt-4 text-slate-800 leading-tight drop-shadow-sm">
+                                            {selectedDisease?.nombre || selectedFirstAid?.nombre || selectedHabit?.titulo}
+                                        </h2>
+                                    </div>
+                                    <button onClick={() => { setSelectedDisease(null); setSelectedHabit(null); setSelectedFirstAid(null); }} className="bg-white p-3 rounded-full shadow-md text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all active:scale-90 flex items-center justify-center">
+                                        ✕
+                                    </button>
+                                </div>
+
+                                <div className="space-y-6 pb-8">
+                                    {selectedDisease && (
+                                        <React.Fragment>
+                                            <section className="bg-white/80 p-6 rounded-[2rem] border border-slate-100 shadow-sm">
+                                                <h4 className="flex items-center gap-3 font-black uppercase text-[10px] text-blue-600 mb-4 tracking-widest">
+                                                    <SVGIcon name="search" size={18} color="currentColor" /> Detección de Síntomas
+                                                </h4>
+                                                <p className="text-sm leading-relaxed text-slate-700 font-bold">{selectedDisease.deteccion}</p>
+                                            </section>
+                                            <section className="bg-white/80 p-6 rounded-[2rem] border border-green-100 shadow-sm">
+                                                <h4 className="flex items-center gap-3 font-black uppercase text-[10px] text-green-600 mb-4 tracking-widest">
+                                                    <SVGIcon name="shield" size={18} color="currentColor" /> Protocolo de Prevención
+                                                </h4>
+                                                <p className="text-sm leading-relaxed text-green-700 font-bold">{selectedDisease.prevencion}</p>
+                                            </section>
+                                            <section className="bg-gradient-to-r from-blue-500 to-blue-600 p-8 rounded-[2rem] text-white shadow-glow-blue">
+                                                <h4 className="flex items-center gap-3 font-black uppercase text-[10px] text-blue-100 mb-4 tracking-widest">
+                                                    <SVGIcon name="activity" size={18} color="currentColor" /> Plan de Acción Sugerido
+                                                </h4>
+                                                <p className="text-lg leading-relaxed font-extrabold">{selectedDisease.queHacer}</p>
+                                            </section>
+                                            <div className="bg-amber-50 border border-amber-200 p-6 rounded-[2rem] flex gap-5 shadow-sm">
+                                                <div className="shrink-0 mt-1 text-amber-600"><SVGIcon name="alert" size={24} color="currentColor" /></div>
+                                                <div>
+                                                    <p className="text-[11px] text-amber-900 font-black uppercase leading-tight tracking-widest mb-1">Aviso de Seguridad Médica</p>
+                                                    <p className="text-xs text-amber-800 font-semibold leading-relaxed italic">Salud UCN: Esta ficha es orientativa. Evite la automedicación. Todo tratamiento debe ser indicado por un médico colegiado.</p>
+                                                </div>
+                                            </div>
+                                        </React.Fragment>
+                                    )}
+
+                                    {selectedFirstAid && (
+                                        <div className="space-y-6">
+                                            {selectedFirstAid.youtubeId ? (
+                                                <div className="w-full aspect-video rounded-[2rem] overflow-hidden shadow-3d border-2 border-white">
+                                                    <iframe 
+                                                        width="100%" 
+                                                        height="100%" 
+                                                        src={`https://www.youtube.com/embed/${selectedFirstAid.youtubeId}?rel=0`} 
+                                                        title={`Video explicativo: ${selectedFirstAid.nombre}`}
+                                                        frameBorder="0" 
+                                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                                        allowFullScreen>
+                                                    </iframe>
+                                                </div>
+                                            ) : (
+                                                <div className="flex justify-center py-6">
+                                                    <Icon3D name={selectedFirstAid.icono} gradient={selectedFirstAid.gradient} shadow={selectedFirstAid.shadow} size={48} />
+                                                </div>
+                                            )}
+                                            
+                                            <div className="bg-white/90 p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-4">
+                                                <h4 className="font-black uppercase text-[11px] text-slate-800 mb-6 tracking-widest flex items-center gap-2">
+                                                    <SVGIcon name="activity" size={18} /> Pasos de Acción Inmediata
+                                                </h4>
+                                                <ul className="space-y-5">
+                                                    {selectedFirstAid.pasos.map((paso, i) => (
+                                                        <li key={i} className="flex items-start gap-4">
+                                                            <div className="flex items-center justify-center w-7 h-7 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 text-white font-black text-xs shrink-0 shadow-md">{i + 1}</div>
+                                                            <p className="text-sm font-bold text-slate-700 leading-relaxed mt-0.5">{paso}</p>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {selectedHabit && (
+                                        <div className="space-y-8">
+                                            <div className="flex justify-center py-6">
+                                                <Icon3D name={selectedHabit.icono} gradient={selectedHabit.gradient} shadow={selectedHabit.shadow} size={48} />
+                                            </div>
+                                            <section className="bg-white/90 p-8 rounded-[2rem] border border-slate-100 shadow-sm">
+                                                <h4 className="font-black uppercase text-[11px] text-slate-800 mb-6 tracking-widest flex items-center gap-3">
+                                                    <SVGIcon name="zap" size={20} color="currentColor" /> Fundamentos de Bienestar
+                                                </h4>
+                                                <p className="text-xl leading-relaxed text-slate-700 font-bold italic">"{selectedHabit.detalles}"</p>
+                                            </section>
+                                        </div>
+                                    )}
+
+                                    <button onClick={() => { setSelectedDisease(null); setSelectedHabit(null); setSelectedFirstAid(null); }} className="w-full bg-slate-900 hover:bg-slate-800 text-white py-6 rounded-2xl font-black shadow-xl active:scale-95 transition-all uppercase tracking-[0.2em] mt-8">
+                                        Cerrar Ficha
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
